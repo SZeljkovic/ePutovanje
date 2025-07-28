@@ -18,12 +18,13 @@ USE `mydb` ;
 -- Table `mydb`.`KORISNIK`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`KORISNIK` (
-  `idKORISNIK` INT NOT NULL,
+  `idKORISNIK` INT NOT NULL AUTO_INCREMENT,
   `Ime` VARCHAR(45) NULL,
   `Prezime` VARCHAR(45) NULL,
   `NazivAgencije` VARCHAR(45) NULL,
   `DatumRodjenja` DATE NULL,
   `KorisnickoIme` VARCHAR(45) NOT NULL,
+  `Lozinka` TEXT NOT NULL,
   `TipKorisnika` TINYINT NOT NULL,
   `StatusNaloga` TINYINT NOT NULL,
   PRIMARY KEY (`idKORISNIK`))
@@ -34,7 +35,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`STATUS_PONUDE`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`STATUS_PONUDE` (
-  `idSTATUS_PONUDE` INT NOT NULL,
+  `idSTATUS_PONUDE` INT NOT NULL AUTO_INCREMENT,
   `Naziv` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idSTATUS_PONUDE`))
 ENGINE = InnoDB;
@@ -44,7 +45,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`PONUDA`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`PONUDA` (
-  `idPONUDA` INT NOT NULL,
+  `idPONUDA` INT NOT NULL AUTO_INCREMENT,
   `Cijena` DECIMAL(6,2) NOT NULL,
   `Opis` VARCHAR(500) NOT NULL,
   `DatumObjavljivanja` DATETIME NOT NULL,
@@ -100,7 +101,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`ČET`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`ČET` (
-  `idČET` INT NOT NULL,
+  `idČET` INT NOT NULL AUTO_INCREMENT,
   `idKORISNIK1` INT NOT NULL,
   `idKORISNIK2` INT NOT NULL,
   PRIMARY KEY (`idČET`),
@@ -123,7 +124,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`STATUS_REZERVACIJE`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`STATUS_REZERVACIJE` (
-  `idSTATUS_REZERVACIJE` INT NOT NULL,
+  `idSTATUS_REZERVACIJE` INT NOT NULL AUTO_INCREMENT,
   `Naziv` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idSTATUS_REZERVACIJE`))
 ENGINE = InnoDB;
@@ -133,7 +134,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`OBAVJEŠTENJE`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`OBAVJEŠTENJE` (
-  `idOBAVJEŠTENJE` INT NOT NULL,
+  `idOBAVJEŠTENJE` INT NOT NULL AUTO_INCREMENT,
   `Sadržaj` VARCHAR(45) NOT NULL,
   `DatumVrijeme` DATETIME NOT NULL,
   `Pročitano` TINYINT NOT NULL,
@@ -152,7 +153,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`PROBLEM`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`PROBLEM` (
-  `idPROBLEM` INT NOT NULL,
+  `idPROBLEM` INT NOT NULL AUTO_INCREMENT,
   `Naslov` VARCHAR(45) NOT NULL,
   `Sadržaj` VARCHAR(45) NOT NULL,
   `idKORISNIK` INT NOT NULL,
@@ -170,7 +171,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`PORUKA`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`PORUKA` (
-  `idPORUKA` INT NOT NULL,
+  `idPORUKA` INT NOT NULL AUTO_INCREMENT,
   `Sadržaj` VARCHAR(45) NOT NULL,
   `VrijemeSlanja` DATETIME NOT NULL,
   `Pročitano` TINYINT NOT NULL,
@@ -189,7 +190,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`REZERVACIJA`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`REZERVACIJA` (
-  `idREZERVACIJA` INT NOT NULL,
+  `idREZERVACIJA` INT NOT NULL AUTO_INCREMENT,
   `Datum` DATETIME NOT NULL,
   `BrojOdraslih` INT NOT NULL,
   `BrojDjece` INT NOT NULL,
@@ -222,7 +223,7 @@ ENGINE = InnoDB;
 -- Table `mydb`.`DESTINACIJA`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`DESTINACIJA` (
-  `idDESTINACIJA` INT NOT NULL,
+  `idDESTINACIJA` INT NOT NULL AUTO_INCREMENT,
   `Naziv` VARCHAR(45) NOT NULL,
   `Opis` VARCHAR(150) NOT NULL,
   `Tip` VARCHAR(45) NOT NULL,
