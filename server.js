@@ -276,30 +276,44 @@ app.get('/profile', authenticateToken, async (req, res) => {
 
 
 //Pregled tudjeg profila
-app.get('/profile/:id', authenticateToken, authenticateAdmin, authenticateAgency, async (req, res) => {
+app.get('/profile/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const requester = req.user;
+    const requesterId = req.user.idKORISNIK;
 
     try {
-        // Ako je korisnik agencija ili admin, provjeravamo profil koji zele da pregledaju
-        const [rows] = await db.promise().query(`
-            SELECT 
-                idKORISNIK, Ime, Prezime, NazivAgencije, DatumRodjenja,
-                KorisnickoIme, TipKorisnika, Email
-            FROM korisnik
-            WHERE idKORISNIK = ?
-        `, [id]);
+        // Tip korisnika koji salje zahtjev
+        const [requesterRow] = await db.promise().query(
+            "SELECT TipKorisnika FROM korisnik WHERE idKORISNIK = ?",
+            [requesterId]
+        );
 
-        if (rows.length === 0) {
+        if (requesterRow.length === 0) {
+            return res.status(404).json({ error: "Requester korisnik nije pronađen." });
+        }
+
+        const requesterTip = requesterRow[0].TipKorisnika;
+
+        if (requesterTip === 2) {
+            return res.status(403).json({ error: "Klijenti ne mogu pregledati tuđe profile." });
+        }
+
+        // Dohvati target korisnika
+        const [targetRow] = await db.promise().query(
+            "SELECT idKORISNIK, Ime, Prezime, NazivAgencije, DatumRodjenja, KorisnickoIme, TipKorisnika, Email FROM korisnik WHERE idKORISNIK = ?",
+            [id]
+        );
+
+        if (targetRow.length === 0) {
             return res.status(404).json({ error: "Korisnik nije pronađen." });
         }
 
-        const targetUser = rows[0];
+        const targetUser = targetRow[0];
 
-        // Ako je requester agencija, a target nije klijent zabrani
-        if (requester.TipKorisnika === 1 && targetUser.TipKorisnika !== 2) {
+        // Ako je requester agencija, a target nije klijent – zabrani
+        if (requesterTip === 1 && targetUser.TipKorisnika !== 2) {
             return res.status(403).json({ error: "Agencije mogu pregledati samo profile klijenata." });
         }
+
 
         res.json({
             message: "Profil korisnika uspješno učitan.",
@@ -307,10 +321,11 @@ app.get('/profile/:id', authenticateToken, authenticateAdmin, authenticateAgency
         });
 
     } catch (err) {
-        console.error("Greška pri učitavanju profila korisnika:", err);
+        console.error("Greška pri učitavanju profila:", err);
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
 
 
 
