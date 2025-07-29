@@ -41,19 +41,16 @@ function authenticateToken(req, res, next) {
     });
 }
 
-function authenticateAdmin(req, res, next) {
+
+async function authenticateAdmin(req, res, next) {
     if (!req.user || !req.user.KorisnickoIme) {
         return res.status(401).json({ error: "Pristup odbijen. Token ne sadrži korisničko ime." });
     }
 
     const korisnickoIme = req.user.KorisnickoIme;
 
-    const query = "SELECT TipKorisnika FROM korisnik WHERE KorisnickoIme = ?";
-    db.query(query, [korisnickoIme], (err, results) => {
-        if (err) {
-            console.error("Greška pri provjeri tipa korisnika:", err);
-            return res.status(500).json({ error: "Greška na serveru." });
-        }
+    try {
+        const [results] = await db.promise().query("SELECT TipKorisnika FROM korisnik WHERE KorisnickoIme = ?", [korisnickoIme]);
 
         if (results.length === 0) {
             return res.status(404).json({ error: "Korisnik nije pronađen." });
@@ -64,9 +61,41 @@ function authenticateAdmin(req, res, next) {
             return res.status(403).json({ error: "Pristup dozvoljen samo administratorima." });
         }
 
-        next();
-    });
+        next(); 
+    } catch (err) {
+        console.error("Greška pri provjeri tipa korisnika:", err);
+        return res.status(500).json({ error: "Greška na serveru." });
+    }
 }
+
+
+async function authenticateAgency(req, res, next) {
+    if (!req.user || !req.user.KorisnickoIme) {
+        return res.status(401).json({ error: "Pristup odbijen. Token ne sadrži korisničko ime." });
+    }
+
+    const korisnickoIme = req.user.KorisnickoIme;
+
+    try {
+        const [results] = await db.promise().query("SELECT TipKorisnika FROM korisnik WHERE KorisnickoIme = ?", [korisnickoIme]);
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        const tip = results[0].TipKorisnika;
+        if (tip !== 1) {
+            return res.status(403).json({ error: "Pristup dozvoljen samo turističkim agencijama." });
+        }
+
+        next(); 
+    } catch (err) {
+        console.error("Greška pri provjeri tipa korisnika:", err);
+        return res.status(500).json({ error: "Greška na serveru." });
+    }
+}
+
+
 
 app.post('/register', async (req, res) => {
     const {
@@ -247,24 +276,12 @@ app.get('/profile', authenticateToken, async (req, res) => {
 
 
 //Pregled tudjeg profila
-app.get('/profile/:id', authenticateToken, async (req, res) => {
+app.get('/profile/:id', authenticateToken, authenticateAdmin, authenticateAgency, async (req, res) => {
     const { id } = req.params;
     const requester = req.user;
 
     try {
-        // Tip korisnika koji salje zahtjev
-        const [tipRow] = await db.promise().query(
-            "SELECT TipKorisnika FROM korisnik WHERE idKORISNIK = ?",
-            [requester.idKORISNIK]
-        );
-
-        if (tipRow.length === 0 || (tipRow[0].TipKorisnika !== 0 && tipRow[0].TipKorisnika !== 1)) {
-            return res.status(403).json({ error: "Pristup dozvoljen samo agencijama i administratorima." });
-        }
-
-        const requesterTip = tipRow[0].TipKorisnika;
-
-        // Korisnik ciji profil se trazi
+        // Ako je korisnik agencija ili admin, provjeravamo profil koji zele da pregledaju
         const [rows] = await db.promise().query(`
             SELECT 
                 idKORISNIK, Ime, Prezime, NazivAgencije, DatumRodjenja,
@@ -279,8 +296,8 @@ app.get('/profile/:id', authenticateToken, async (req, res) => {
 
         const targetUser = rows[0];
 
-        // Ako je requester agencija, a target nije klijent (2) => zabrani
-        if (requesterTip === 1 && targetUser.TipKorisnika !== 2) {
+        // Ako je requester agencija, a target nije klijent zabrani
+        if (requester.TipKorisnika === 1 && targetUser.TipKorisnika !== 2) {
             return res.status(403).json({ error: "Agencije mogu pregledati samo profile klijenata." });
         }
 
@@ -294,6 +311,7 @@ app.get('/profile/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
 
 
 
