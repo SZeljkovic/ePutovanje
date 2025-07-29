@@ -326,14 +326,56 @@ app.get('/profile/:id', authenticateToken, async (req, res) => {
     }
 });
 
+//kreiranje administratorskog naloga (samo administrator moze kreirati ostale administratorske naloge)
+app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, res) => {
+    const { Ime, Prezime, KorisnickoIme, Lozinka, Email } = req.body;
 
+    if (!Ime || !Prezime || !KorisnickoIme || !Lozinka || !Email) {
+        return res.status(400).json({ error: "Sva polja su obavezna za administratorski nalog." });
+    }
 
+    try {
+        // Provjera da li korisničko ime već postoji
+        const [existing] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE KorisnickoIme = ?",
+            [KorisnickoIme]
+        );
 
+        if (existing.length > 0) {
+            return res.status(409).json({ error: "Korisničko ime već postoji." });
+        }
 
+        // Heširanje lozinke
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(Lozinka, saltRounds);
 
+        // TipKorisnika za admina je 0, StatusNaloga odmah aktivan (1)
+        const TipKorisnika = 0;
+        const StatusNaloga = 1;
 
+        // Ubacivanje u bazu
+        const insertQuery = `
+            INSERT INTO korisnik
+            (Ime, Prezime, KorisnickoIme, Lozinka, TipKorisnika, StatusNaloga, Email)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
 
+        await db.promise().query(insertQuery, [
+            Ime,
+            Prezime,
+            KorisnickoIme,
+            hashedPassword,
+            TipKorisnika,
+            StatusNaloga,
+            Email
+        ]);
 
+        return res.status(201).json({ message: "Administratorski nalog uspješno kreiran." });
+    } catch (err) {
+        console.error("Greška pri kreiranju administratorskog naloga:", err);
+        return res.status(500).json({ error: "Greška na serveru." });
+    }
+});
 
 
 
