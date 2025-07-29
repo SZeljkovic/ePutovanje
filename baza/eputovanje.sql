@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`KORISNIK` (
   `KorisnickoIme` VARCHAR(45) NOT NULL,
   `Lozinka` TEXT NOT NULL,
   `TipKorisnika` TINYINT NOT NULL,
-  `StatusNaloga` TINYINT NOT NULL,
+  `StatusNaloga` VARCHAR(45) NOT NULL,
+  `Email` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`idKORISNIK`))
 ENGINE = InnoDB;
 

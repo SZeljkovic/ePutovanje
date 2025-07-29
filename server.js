@@ -19,6 +19,14 @@ app.get('/', (req, res) => {
     res.send('ePutovanje backend radi!');
 });
 
+// Pracenje broja neuspjelih pokusaja
+const failedAttempts = {};
+
+// Max broj pokusaja
+const MAX_ATTEMPTS = 3;
+
+
+
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -68,7 +76,8 @@ app.post('/register', async (req, res) => {
         DatumRodjenja,
         KorisnickoIme,
         Lozinka,
-        TipKorisnika
+        TipKorisnika,
+        Email
     } = req.body;
 
     //  Validacija: Dozvoljeni su samo tipovi 1 (agencija) i 2 (klijent)
@@ -77,8 +86,8 @@ app.post('/register', async (req, res) => {
     }
 
     //  Validacija obaveznih polja
-    if (!KorisnickoIme || !Lozinka) {
-        return res.status(400).json({ error: "Korisničko ime i lozinka su obavezni." });
+    if (!KorisnickoIme || !Lozinka || !Email) {
+        return res.status(400).json({ error: "Korisničko ime, lozinka i email su obavezni." });
     }
 
     if (TipKorisnika === 2) {
@@ -112,8 +121,8 @@ app.post('/register', async (req, res) => {
         //  Upit za ubacivanje u bazu
         const insertQuery = `
             INSERT INTO korisnik 
-            (Ime, Prezime, NazivAgencije, DatumRodjenja, KorisnickoIme, Lozinka, TipKorisnika, StatusNaloga)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (Ime, Prezime, NazivAgencije, DatumRodjenja, KorisnickoIme, Lozinka, TipKorisnika, StatusNaloga, Email)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         await db.promise().query(insertQuery, [
@@ -124,7 +133,8 @@ app.post('/register', async (req, res) => {
             KorisnickoIme,
             hashedPassword,
             TipKorisnika,
-            StatusNaloga
+            StatusNaloga,
+            Email
         ]);
 
         return res.status(201).json({ message: "Korisnik uspješno registrovan." });
@@ -192,6 +202,101 @@ app.put('/login', async (req, res) => {
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
+
+
+
+//Pregled profila
+app.get('/profile', authenticateToken, async (req, res) => {
+    try {
+        const korisnikId = req.user.idKORISNIK; 
+
+        const query = `
+            SELECT 
+                k.idKORISNIK, 
+                k.Ime, 
+                k.Prezime, 
+                k.NazivAgencije, 
+                k.DatumRodjenja, 
+                k.KorisnickoIme, 
+                k.TipKorisnika,
+                k.StatusNaloga,
+                k.Email
+            FROM korisnik k
+            WHERE k.idKORISNIK = ?
+        `;
+
+        const [rows] = await db.promise().query(query, [korisnikId]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        const user = rows[0]; // id
+
+        res.json({
+            message: "Profil uspješno učitan.",
+            user: user
+        });
+    } catch (err) {
+        console.error("Greška pri učitavanju profila:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom učitavanja profila." });
+    }
+});
+
+
+
+//Pregled tudjeg profila
+app.get('/profile/:id', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const requester = req.user;
+
+    try {
+        // Tip korisnika koji salje zahtjev
+        const [tipRow] = await db.promise().query(
+            "SELECT TipKorisnika FROM korisnik WHERE idKORISNIK = ?",
+            [requester.idKORISNIK]
+        );
+
+        if (tipRow.length === 0 || (tipRow[0].TipKorisnika !== 0 && tipRow[0].TipKorisnika !== 1)) {
+            return res.status(403).json({ error: "Pristup dozvoljen samo agencijama i administratorima." });
+        }
+
+        const requesterTip = tipRow[0].TipKorisnika;
+
+        // Korisnik ciji profil se trazi
+        const [rows] = await db.promise().query(`
+            SELECT 
+                idKORISNIK, Ime, Prezime, NazivAgencije, DatumRodjenja,
+                KorisnickoIme, TipKorisnika, Email
+            FROM korisnik
+            WHERE idKORISNIK = ?
+        `, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        const targetUser = rows[0];
+
+        // Ako je requester agencija, a target nije klijent (2) => zabrani
+        if (requesterTip === 1 && targetUser.TipKorisnika !== 2) {
+            return res.status(403).json({ error: "Agencije mogu pregledati samo profile klijenata." });
+        }
+
+        res.json({
+            message: "Profil korisnika uspješno učitan.",
+            user: targetUser
+        });
+
+    } catch (err) {
+        console.error("Greška pri učitavanju profila korisnika:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
 
 
 
