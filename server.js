@@ -26,6 +26,9 @@ const failedAttempts = {};
 // Max broj pokusaja
 const MAX_ATTEMPTS = 3;
 
+// Vrijeme cekanja
+const LOCKOUT_TIME = 1 * 60 * 1000;
+
 
 
 function authenticateToken(req, res, next) {
@@ -326,6 +329,107 @@ app.get('/profile/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
+
+
+// Uredjivanje profila
+app.put('/edit-profile', authenticateToken, async (req, res) => {
+    const korisnikId = req.user.idKORISNIK;
+    const {
+        Ime,
+        Prezime,
+        NazivAgencije,
+        DatumRodjenja,
+        NovaLozinka,
+        StaraLozinka,
+        Email
+    } = req.body;
+
+    try {
+        // Dohvati trenutne podatke korisnika
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            [korisnikId]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        const user = rows[0];
+
+        // Ako korisnik pokušava promijeniti lozinku:
+        if (NovaLozinka) {
+            if (!StaraLozinka) {
+                return res.status(400).json({ error: "Unesite staru lozinku radi potvrde." });
+            }
+
+            // Provjeri broj pokusaja
+            const attempt = failedAttempts[korisnikId] || { count: 0, lastAttempt: null };
+            if (attempt.count >= MAX_ATTEMPTS) {
+                const timeLeft = LOCKOUT_TIME - (Date.now() - attempt.lastAttempt);
+                if (timeLeft > 0) {
+                    return res.status(403).json({
+                        error: `Previše neuspjelih pokušaja. Pokušajte ponovo za ${Math.ceil(timeLeft / 1000)} sekundi.`
+                    });
+                }
+            }
+            const match = await bcrypt.compare(StaraLozinka, user.Lozinka);
+
+            if (!match) {
+                failedAttempts[korisnikId] = {
+                    count: attempt.count + 1,
+                    lastAttempt: Date.now()
+                };
+
+                const remaining = MAX_ATTEMPTS - failedAttempts[korisnikId].count;
+                return res.status(401).json({
+                    error: `Pogrešna lozinka. Možete pokušati još ${remaining} puta ili resetovati lozinku.`,
+                    allowReset: attempt.count + 1 < MAX_ATTEMPTS
+                });
+            }
+
+            // Ako se lozinke poklapaju
+            const hashedNew = await bcrypt.hash(NovaLozinka, 10);
+            await db.promise().query(
+                "UPDATE korisnik SET Lozinka = ? WHERE idKORISNIK = ?",
+                [hashedNew, korisnikId]
+            );
+
+            delete failedAttempts[korisnikId];
+        }
+
+        const novoIme = Ime !== undefined ? Ime : user.Ime;
+        const novoPrezime = Prezime !== undefined ? Prezime : user.Prezime;
+        const noviNazivAgencije = NazivAgencije !== undefined ? NazivAgencije : user.NazivAgencije;
+        const noviEmail = Email !== undefined ? Email : user.Email;
+        const noviDatumRodjenja = DatumRodjenja !== undefined ? DatumRodjenja : user.DatumRodjenja;
+
+        await db.promise().query(`
+            UPDATE korisnik
+            SET Ime = ?, Prezime = ?, NazivAgencije = ?, DatumRodjenja = ?, Email = ?
+            WHERE idKORISNIK = ?
+        `, [novoIme, novoPrezime, noviNazivAgencije, noviDatumRodjenja, noviEmail, korisnikId]);
+
+
+        const [updatedRows] = await db.promise().query(
+            "SELECT idKORISNIK, Ime, Prezime, NazivAgencije, DatumRodjenja, Email FROM korisnik WHERE idKORISNIK = ?",
+            [korisnikId]
+        );
+
+        res.json({
+            message: "Profil uspješno ažuriran.",
+            user: updatedRows[0]
+        });
+
+    } catch (err) {
+        console.error("Greška prilikom ažuriranja profila:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
 
 //kreiranje administratorskog naloga (samo administrator moze kreirati ostale administratorske naloge)
 app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, res) => {
