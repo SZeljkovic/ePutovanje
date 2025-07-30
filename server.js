@@ -615,9 +615,72 @@ app.get('/all-profiles', authenticateToken, authenticateAdmin, async (req, res) 
 });
 
 
+// Suspendovanje naloga (samo admin)
+app.put('/suspend-account/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idKorisnik = req.params.id;
+
+    try {
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        if (parseInt(idKorisnik) === req.user.idKORISNIK) {
+            return res.status(400).json({ error: "Ne možete suspendovati svoj nalog." });
+        }
+		
+		if (parseInt(rows[0].StatusNaloga) === 0) {
+			return res.status(400).json({ error: "Nalog je već suspendovan." });
+		}
+
+        await db.promise().query(
+            "UPDATE korisnik SET StatusNaloga = 0 WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        return res.json({ message: "Nalog korisnika je suspendovan." });
+
+    } catch (err) {
+        console.error("Greška pri suspendovanju naloga:", err);
+        return res.status(500).json({ error: "Greška na serveru prilikom suspendovanja naloga." });
+    }
+});
 
 
+// Reaktivacija naloga (samo admin)
+app.put('/reactivate-account/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idKorisnik = req.params.id;
 
+    try {
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        if (parseInt(rows[0].StatusNaloga) === 1) {
+            return res.status(400).json({ error: "Nalog je već aktivan." });
+        }
+
+        await db.promise().query(
+            "UPDATE korisnik SET StatusNaloga = 1 WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        res.json({ message: "Nalog korisnika je ponovo aktiviran." });
+
+    } catch (err) {
+        console.error("Greška pri aktivaciji naloga:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom aktivacije naloga." });
+    }
+});
 
 
 
