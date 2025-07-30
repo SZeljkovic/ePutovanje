@@ -584,6 +584,36 @@ app.delete('/delete-profile/:id', authenticateToken, authenticateAdmin, async (r
     }
 });
 
+// pregled svih profila (samo za administratore)
+app.get('/all-profiles', authenticateToken, authenticateAdmin, async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                idKORISNIK, 
+                Ime, 
+                Prezime, 
+                NazivAgencije, 
+                DatumRodjenja, 
+                KorisnickoIme, 
+                TipKorisnika, 
+                StatusNaloga, 
+                Email
+            FROM korisnik
+        `;
+
+        const [rows] = await db.promise().query(query);
+
+        res.json({
+            message: "Lista svih korisničkih profila uspješno učitana.",
+            korisnici: rows
+        });
+
+    } catch (err) {
+        console.error("Greška pri učitavanju svih profila:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
 
 
 
