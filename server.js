@@ -615,13 +615,33 @@ app.get('/all-profiles', authenticateToken, authenticateAdmin, async (req, res) 
 });
 
 
+
+// Dohvatanje svih suspendovanih naloga (samo admin)
+app.get('/suspended-accounts', authenticateToken, authenticateAdmin, async (req, res) => {
+    try {
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE StatusNaloga = -1"
+        );
+
+        res.json({ 
+            message: "Suspendovani nalozi uspješno dohvaćeni.",
+            suspendovaniNalozi: rows 
+        });
+    } catch (err) {
+        console.error("Greška pri dohvatanju suspendovanih naloga:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dohvatanja suspendovanih naloga." });
+    }
+});
+
+
+
 // Suspendovanje naloga (samo admin)
 app.put('/suspend-account/:id', authenticateToken, authenticateAdmin, async (req, res) => {
     const idKorisnik = req.params.id;
 
     try {
         const [rows] = await db.promise().query(
-            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            "SELECT * FROM korisnik WHERE idKORISNIK = ? AND StatusNaloga = 1",
             [idKorisnik]
         );
 
@@ -632,13 +652,9 @@ app.put('/suspend-account/:id', authenticateToken, authenticateAdmin, async (req
         if (parseInt(idKorisnik) === req.user.idKORISNIK) {
             return res.status(400).json({ error: "Ne možete suspendovati svoj nalog." });
         }
-		
-		if (parseInt(rows[0].StatusNaloga) === 0) {
-			return res.status(400).json({ error: "Nalog je već suspendovan." });
-		}
 
         await db.promise().query(
-            "UPDATE korisnik SET StatusNaloga = 0 WHERE idKORISNIK = ?",
+            "UPDATE korisnik SET StatusNaloga = -1 WHERE idKORISNIK = ?",
             [idKorisnik]
         );
 
@@ -651,22 +667,19 @@ app.put('/suspend-account/:id', authenticateToken, authenticateAdmin, async (req
 });
 
 
+
 // Reaktivacija naloga (samo admin)
 app.put('/reactivate-account/:id', authenticateToken, authenticateAdmin, async (req, res) => {
     const idKorisnik = req.params.id;
 
     try {
         const [rows] = await db.promise().query(
-            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            "SELECT * FROM korisnik WHERE idKORISNIK = ? AND StatusNaloga = -1",
             [idKorisnik]
         );
 
         if (rows.length === 0) {
             return res.status(404).json({ error: "Korisnik nije pronađen." });
-        }
-
-        if (parseInt(rows[0].StatusNaloga) === 1) {
-            return res.status(400).json({ error: "Nalog je već aktivan." });
         }
 
         await db.promise().query(
@@ -683,6 +696,70 @@ app.put('/reactivate-account/:id', authenticateToken, authenticateAdmin, async (
 });
 
 
+
+
+// Svi zahtjevi za odobravanje naloga turistickih agencija (samo admin)
+app.get('/agency-requests', authenticateToken, authenticateAdmin, async (req, res) => {
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT idKORISNIK, NazivAgencije, KorisnickoIme, Email 
+             FROM korisnik 
+             WHERE TipKorisnika = 1 AND StatusNaloga = 0`
+        );
+
+        res.json({
+            message: "Zahtjevi agencija uspješno dohvaćeni.",
+            agencyRequests: rows
+        });
+    } catch (err) {
+        console.error("Greška pri dohvatanju zahtjeva:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dohvatanja zahtjeva." });
+    }
+});
+
+
+
+// Odobravanje naloga turisticke agencije (samo admin)
+app.put('/agency-requests/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idKorisnik = req.params.id;
+
+    try {
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        if (parseInt(rows[0].StatusNaloga) === 1) {
+            return res.status(400).json({ error: "Nalog je već odobren." });
+        }
+
+        if (parseInt(rows[0].StatusNaloga) === -1) {
+            return res.status(400).json({ error: "Nalog je suspendovan. Ne može biti odobren." });
+        }
+
+        await db.promise().query(
+            "UPDATE korisnik SET StatusNaloga = 1 WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        const [updatedRows] = await db.promise().query(
+            "SELECT idKorisnik, NazivAgencije, KorisnickoIme, Email, StatusNaloga FROM korisnik WHERE idKorisnik = ?",
+            [idKorisnik]
+        );
+
+        res.json({
+            message: "Nalog je uspješno odobren.",
+            approvedAccount: updatedRows[0] 
+        });
+    } catch (err) {
+        console.error("Greška pri odobravanju naloga:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom odobravanja naloga." });
+    }
+});
 
 
 // Start server
