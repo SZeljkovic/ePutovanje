@@ -3,7 +3,8 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-
+const nodemailer = require("nodemailer");
+const crypto = require('crypto');
 
 require('dotenv').config();
 
@@ -376,6 +377,113 @@ app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, re
         return res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
+
+
+app.post('/forgot-password', async (req, res) => {
+    const { KorisnickoIme } = req.body;
+
+    if (!KorisnickoIme) {
+        return res.status(400).json({ error: "Unesite korisničko ime." });
+    }
+
+    try {
+        // Provjera da li korisnik postoji
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE KorisnickoIme = ?",
+            [KorisnickoIme]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        const korisnik = rows[0];
+
+        // Generiši novu privremenu lozinku
+        const novaLozinka = crypto.randomBytes(6).toString('hex'); // npr. 12 karaktera
+        const hashedLozinka = await bcrypt.hash(novaLozinka, 10);
+
+        // Ažuriraj lozinku u bazi
+        await db.promise().query(
+            "UPDATE korisnik SET Lozinka = ? WHERE KorisnickoIme = ?",
+            [hashedLozinka, KorisnickoIme]
+        );
+
+        // Pošalji mejl sa novom lozinkom
+        const transporter = nodemailer.createTransport({
+            host: "live.smtp.mailtrap.io",
+            port: 587,
+            secure: false,
+            auth: {
+                user: "api",
+                pass: "a2a56baeace0bb97be50120d4be74573",
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+
+        /*const info = await transporter.sendMail({
+            from: '"ePutovanje" <eputovanje@gmail.com>',
+            to: korisnik.Email,
+            subject: "Privremena lozinka",
+            text: `Vaša nova privremena lozinka je: ${novaLozinka}`,
+            html: `<p>Poštovani,</p><p>Vaša nova privremena lozinka je: <b>${novaLozinka}</b></p><p>Preporučujemo da je odmah promijenite nakon prijave.</p>`,
+        });*/
+
+        //console.log("Mejl poslat:", info.messageId);
+
+        // Vrati korisniku novu lozinku u odgovoru (za testiranje)
+        res.status(200).json({
+            message: "Nova lozinka je poslana na e-mail.",
+            novaLozinka: novaLozinka // ovo ukloniti u produkciji
+        });
+
+    } catch (error) {
+        console.error("Greška pri resetu lozinke:", error);
+        res.status(500).json({ error: "Greška na serveru pri resetu lozinke." });
+    }
+});
+
+
+app.delete('/delete-profile/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idKorisnik = req.params.id;
+
+    try {
+        // Provjera da li korisnik postoji
+        const [rows] = await db.promise().query(
+            "SELECT * FROM korisnik WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Korisnik nije pronađen." });
+        }
+
+        // Ne dozvoli adminu da obriše sam sebe
+        if (parseInt(idKorisnik) === req.user.idKORISNIK) {
+            return res.status(400).json({ error: "Ne možete obrisati svoj administratorski nalog." });
+        }
+
+        // Brisanje korisnika
+        await db.promise().query(
+            "DELETE FROM korisnik WHERE idKORISNIK = ?",
+            [idKorisnik]
+        );
+
+        res.json({ message: "Korisnik je uspješno obrisan." });
+
+    } catch (err) {
+        console.error("Greška pri brisanju korisnika:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom brisanja korisnika." });
+    }
+});
+
+
+
+
+
 
 
 
