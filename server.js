@@ -770,20 +770,25 @@ app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, 
         datumPovratka,
         tipPrevoza,
         brojSlobodnihMjesta,
-        najatraktivnijaPonuda
+        najatraktivnijaPonuda,
+        idDESTINACIJA // Dodajemo ID destinacije u tijelo zahtjeva
     } = req.body;
-	
-	   // Validacija da broj slobodnih mjesta nije manji od 0
+
+    if (!idDESTINACIJA) {
+        return res.status(400).json({ error: "ID destinacije je obavezan." });
+    }
+
     if (brojSlobodnihMjesta === undefined || brojSlobodnihMjesta < 1) {
         return res.status(400).json({ error: "Broj slobodnih mjesta ne može biti manji od 1." });
     }
-	
-    const idKorisnik = req.user.idKORISNIK; // agencija koja kreira ponudu
-    const datumObjavljivanja = new Date(); // datum objavljivanja = datum kreiranja ponude
-    const statusPonude = 0; //na cekanju
+
+    const idKorisnik = req.user.idKORISNIK;
+    const datumObjavljivanja = new Date();
+    const statusPonude = 0;
 
     try {
-        await db.promise().query(`
+        // Prvo unosimo ponudu
+        const [result] = await db.promise().query(`
             INSERT INTO ponuda (
                 Cijena,
                 Opis,
@@ -810,12 +815,22 @@ app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, 
             statusPonude
         ]);
 
-        res.status(201).json({ message: "Ponuda uspješno kreirana. Čeka odobrenje administratora." });
+        const idPONUDA = result.insertId; // Dobijamo ID kreirane ponude
+
+        // Zatim unosimo vezu ponuda <-> destinacija
+        await db.promise().query(`
+            INSERT INTO ponuda_has_destinacija (idPONUDA, idDESTINACIJA)
+            VALUES (?, ?)
+        `, [idPONUDA, idDESTINACIJA]);
+
+        res.status(201).json({ message: "Ponuda uspješno kreirana i povezana s destinacijom. Čeka odobrenje administratora." });
     } catch (err) {
         console.error("Greška pri kreiranju ponude:", err);
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
+
 
 //odobravanje ili odbijanje zahtjeva za ponudu - administrator
 app.put('/zahtjevi-ponuda/:id/status', authenticateToken, authenticateAdmin, async (req, res) => {
@@ -898,6 +913,212 @@ app.get('/zahtjevi-ponuda/:id', authenticateToken, authenticateAdmin, async (req
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
+
+
+
+
+app.get('/ponude', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                p.idPONUDA,
+                p.Cijena,
+                p.Opis,
+                p.DatumObjavljivanja,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                p.TipPrevoza,
+                p.BrojSlobodnihMjesta,
+                p.NajatraktivnijaPonuda,
+                p.idKORISNIK,
+                d.idDESTINACIJA,
+                d.Naziv AS NazivDestinacije,
+                d.Opis AS OpisDestinacije,
+                d.Tip AS TipDestinacije
+            FROM 
+                ponuda p
+            JOIN 
+                ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN 
+                destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE 
+                p.StatusPonude = 1
+            ORDER BY 
+                p.DatumObjavljivanja DESC
+        `;
+
+        const [rows] = await db.promise().query(query);
+
+        // Grupisanje ponuda po idPONUDA
+        const ponudeMap = {};
+
+        for (const row of rows) {
+            if (!ponudeMap[row.idPONUDA]) {
+                ponudeMap[row.idPONUDA] = {
+                    idPONUDA: row.idPONUDA,
+                    Cijena: row.Cijena,
+                    Opis: row.Opis,
+                    DatumObjavljivanja: row.DatumObjavljivanja,
+                    DatumPolaska: row.DatumPolaska,
+                    DatumPovratka: row.DatumPovratka,
+                    TipPrevoza: row.TipPrevoza,
+                    BrojSlobodnihMjesta: row.BrojSlobodnihMjesta,
+                    NajatraktivnijaPonuda: !!row.NajatraktivnijaPonuda,
+                    idKORISNIK: row.idKORISNIK,
+                    Destinacije: []
+                };
+            }
+
+            ponudeMap[row.idPONUDA].Destinacije.push({
+                idDESTINACIJA: row.idDESTINACIJA,
+                Naziv: row.NazivDestinacije,
+                Opis: row.OpisDestinacije,
+                Tip: row.TipDestinacije
+            });
+        }
+
+        const ponude = Object.values(ponudeMap);
+        res.json(ponude);
+
+    } catch (err) {
+        console.error("Greška pri dobavljanju ponuda:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dobavljanja ponuda." });
+    }
+});
+
+
+app.get('/ponuda/:id', async (req, res) => {
+    const ponudaId = req.params.id;
+
+    try {
+        const query = `
+            SELECT 
+                p.idPONUDA,
+                p.Cijena,
+                p.Opis,
+                p.DatumObjavljivanja,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                p.TipPrevoza,
+                p.BrojSlobodnihMjesta,
+                p.NajatraktivnijaPonuda,
+                p.idKORISNIK,
+                d.idDESTINACIJA,
+                d.Naziv AS NazivDestinacije,
+                d.Opis AS OpisDestinacije,
+                d.Tip AS TipDestinacije
+            FROM 
+                ponuda p
+            JOIN 
+                ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN 
+                destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE 
+                p.idPONUDA = ?
+        `;
+
+        //Potencijalni ce i ovdje mozda trebati dodati where statusponude=1
+
+        const [rows] = await db.promise().query(query, [ponudaId]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena." });
+        }
+
+        const ponuda = {
+            idPONUDA: rows[0].idPONUDA,
+            Cijena: rows[0].Cijena,
+            Opis: rows[0].Opis,
+            DatumObjavljivanja: rows[0].DatumObjavljivanja,
+            DatumPolaska: rows[0].DatumPolaska,
+            DatumPovratka: rows[0].DatumPovratka,
+            TipPrevoza: rows[0].TipPrevoza,
+            BrojSlobodnihMjesta: rows[0].BrojSlobodnihMjesta,
+            NajatraktivnijaPonuda: !!rows[0].NajatraktivnijaPonuda,
+            idKORISNIK: rows[0].idKORISNIK,
+            Destinacije: []
+        };
+
+        for (const row of rows) {
+            ponuda.Destinacije.push({
+                idDESTINACIJA: row.idDESTINACIJA,
+                Naziv: row.NazivDestinacije,
+                Opis: row.OpisDestinacije,
+                Tip: row.TipDestinacije
+            });
+        }
+
+        res.json(ponuda);
+
+    } catch (err) {
+        console.error("Greška pri dobavljanju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dobavljanja ponude." });
+    }
+});
+
+
+app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idPONUDA = req.params.id;
+
+    try {
+        // Prvo obriši sve veze između ponude i destinacija
+        await db.promise().query(
+            "DELETE FROM ponuda_has_destinacija WHERE idPONUDA = ?",
+            [idPONUDA]
+        );
+
+        // Zatim obriši samu ponudu
+        const [result] = await db.promise().query(
+            "DELETE FROM ponuda WHERE idPONUDA = ?",
+            [idPONUDA]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena." });
+        }
+
+        res.json({ message: "Ponuda uspješno obrisana." });
+
+    } catch (err) {
+        console.error("Greška pri brisanju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom brisanja ponude." });
+    }
+});
+
+app.get('/destinacije', authenticateToken, async (req, res) => {
+    try {
+        const [rows] = await db.promise().query("SELECT * FROM destinacija");
+        res.json(rows);
+    } catch (err) {
+        console.error("Greška pri dohvaćanju destinacija:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dohvaćanja destinacija." });
+    }
+});
+
+
+app.post('/dodaj-destinaciju', authenticateToken, authenticateAdmin, async (req, res) => {
+    const { Naziv, Opis, Tip } = req.body;
+
+    if (!Naziv || !Opis || !Tip) {
+        return res.status(400).json({ error: "Sva polja (Naziv, Opis, Tip) su obavezna." });
+    }
+
+    try {
+        const [result] = await db.promise().query(
+            "INSERT INTO destinacija (Naziv, Opis, Tip) VALUES (?, ?, ?)",
+            [Naziv, Opis, Tip]
+        );
+
+        res.status(201).json({ message: "Destinacija uspješno dodana.", id: result.insertId });
+    } catch (err) {
+        console.error("Greška pri dodavanju destinacije:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dodavanja destinacije." });
+    }
+});
+
+
+
+
 
 
 
