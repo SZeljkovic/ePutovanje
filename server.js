@@ -1117,9 +1117,130 @@ app.post('/dodaj-destinaciju', authenticateToken, authenticateAdmin, async (req,
 });
 
 
+//pregled svojih ponuda - agencija 
+app.get('/ponude/moje', authenticateToken, authenticateAgency, async (req, res) => {
+    try {
+        const idAgencije = req.user.idKORISNIK; // direktno iz tokena
+
+        console.log("ID agencije koja šalje zahtjev:", idAgencije);
+
+        const [ponude] = await db.promise().query(`
+            SELECT * FROM ponuda WHERE idKorisnik = ?
+        `, [idAgencije]);
+
+        return res.json(ponude);
+
+    } catch (err) {
+        console.error("Greška pri dohvatu ponuda:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+// pregled pojedinacne ponude - agencija (moze samo svoje ponude gledati)
+app.get('/ponude/moje/:id', authenticateToken, authenticateAgency, async (req, res) => {
+    const idPONUDA = req.params.id;
+    const idKorisnik = req.user.idKORISNIK;  // Koristimo idKORISNIK iz tokena direktno
+
+    try {
+        const [rows] = await db.promise().query(`
+            SELECT 
+                p.*, 
+                d.Naziv AS NazivDestinacije, 
+                d.Opis,
+                d.Tip
+            FROM ponuda p
+            JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE p.idPONUDA = ? AND p.idKORISNIK = ?
+        `, [idPONUDA, idKorisnik]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena ili ne pripada ovoj agenciji." });
+        }
+
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Greška pri dohvaćanju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
 
 
 
+
+// izmjena ponude - agencija može mijenjati samo svoje ponude
+
+app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req, res) => {
+    const idPONUDA = req.params.id;
+    const idKorisnik = req.user.idKORISNIK;
+
+    const {
+        cijena,
+        opis,
+        datumPolaska,
+        datumPovratka,
+        tipPrevoza,
+        brojSlobodnihMjesta,
+        najatraktivnijaPonuda,
+        idDESTINACIJA
+    } = req.body;
+
+    if (brojSlobodnihMjesta !== undefined && brojSlobodnihMjesta < 1) {
+        return res.status(400).json({ error: "Broj slobodnih mjesta ne može biti manji od 1." });
+    }
+
+    try {
+        // Provjeri da li ponuda pripada toj agenciji
+        const [check] = await db.promise().query(`
+            SELECT * FROM ponuda WHERE idPONUDA = ? AND idKORISNIK = ?
+        `, [idPONUDA, idKorisnik]);
+
+        if (check.length === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena ili ne pripada ovoj agenciji." });
+        }
+
+        // Ažuriranje ponude
+       
+		await db.promise().query(`
+			UPDATE ponuda
+			SET 
+				Cijena = ?, 
+				Opis = ?, 
+				DatumPolaska = ?, 
+				DatumPovratka = ?, 
+				TipPrevoza = ?, 
+				BrojSlobodnihMjesta = ?, 
+				NajatraktivnijaPonuda = ?,
+				StatusPonude = 0          -- reset statusa na "na čekanju odobrenja"
+			WHERE idPONUDA = ?
+		`, [
+			cijena,
+			opis,
+			datumPolaska,
+			datumPovratka,
+			tipPrevoza,
+			brojSlobodnihMjesta,
+			najatraktivnijaPonuda ? 1 : 0,
+			idPONUDA
+		]);
+
+
+        if (idDESTINACIJA) {
+            // Ažuriranje destinacije
+            await db.promise().query(`
+                UPDATE ponuda_has_destinacija 
+                SET idDESTINACIJA = ? 
+                WHERE idPONUDA = ?
+            `, [idDESTINACIJA, idPONUDA]);
+        }
+	//ponuda kad se azurira ponovo postaje zahtjev i treba je administrator odobriti/odbiti
+        res.json({ message: "Ponuda uspješno ažurirana." });
+    } catch (err) {
+        console.error("Greška pri ažuriranju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
 
 
 
