@@ -762,6 +762,146 @@ app.put('/agency-requests/:id', authenticateToken, authenticateAdmin, async (req
 });
 
 
+app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, res) => {
+    const {
+        cijena,
+        opis,
+        datumPolaska,
+        datumPovratka,
+        tipPrevoza,
+        brojSlobodnihMjesta,
+        najatraktivnijaPonuda
+    } = req.body;
+	
+	   // Validacija da broj slobodnih mjesta nije manji od 0
+    if (brojSlobodnihMjesta === undefined || brojSlobodnihMjesta < 1) {
+        return res.status(400).json({ error: "Broj slobodnih mjesta ne može biti manji od 1." });
+    }
+	
+    const idKorisnik = req.user.idKORISNIK; // agencija koja kreira ponudu
+    const datumObjavljivanja = new Date(); // datum objavljivanja = datum kreiranja ponude
+    const statusPonude = 0; //na cekanju
+
+    try {
+        await db.promise().query(`
+            INSERT INTO ponuda (
+                Cijena,
+                Opis,
+                DatumObjavljivanja,
+                DatumPolaska,
+                DatumPovratka,
+                TipPrevoza,
+                BrojSlobodnihMjesta,
+                NajatraktivnijaPonuda,
+                idKORISNIK,
+                StatusPonude
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            cijena,
+            opis,
+            datumObjavljivanja,
+            datumPolaska,
+            datumPovratka,
+            tipPrevoza,
+            brojSlobodnihMjesta,
+            najatraktivnijaPonuda ? 1 : 0,
+            idKorisnik,
+            statusPonude
+        ]);
+
+        res.status(201).json({ message: "Ponuda uspješno kreirana. Čeka odobrenje administratora." });
+    } catch (err) {
+        console.error("Greška pri kreiranju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+//odobravanje ili odbijanje zahtjeva za ponudu - administrator
+app.put('/zahtjevi-ponuda/:id/status', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idPonude = req.params.id;
+    const { StatusPonude } = req.body; // sada se očekuje broj: 1 ili -1
+
+    if (![1, -1].includes(StatusPonude)) {
+        return res.status(400).json({ error: "Dozvoljene vrijednosti za StatusPonude su 1 (odobrena) i -1 (poništena)." });
+    }
+
+    try {
+        const [rows] = await db.promise().query(
+            "SELECT * FROM ponuda WHERE idPONUDA = ?",
+            [idPonude]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena." });
+        }
+
+        await db.promise().query(
+            "UPDATE ponuda SET StatusPonude = ? WHERE idPONUDA = ?",
+            [StatusPonude, idPonude]
+        );
+
+        const akcija = StatusPonude === 1 ? 'odobrena' : 'poništena';
+        res.json({ message: `Ponuda je ${akcija}.` });
+    } catch (err) {
+        console.error("Greška pri ažuriranju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+//pregled svih zahtjeva za kreiranje ponuda 
+	app.get('/zahtjevi-ponuda', authenticateToken, authenticateAdmin, async (req, res) => {
+    try {
+        const [ponude] = await db.promise().query(
+            "SELECT * FROM ponuda WHERE StatusPonude = 0"
+        );
+        res.json(ponude);
+    } catch (err) {
+        console.error("Greška pri dobavljanju ponuda:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+//pregled pojedinacnog zahtjeva za ponude - administrator
+app.get('/zahtjevi-ponuda/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const idPonude = req.params.id;
+
+    try {
+        const [rows] = await db.promise().query(`
+            SELECT 
+                p.idPONUDA,
+                p.Cijena,
+                p.Opis,
+                p.DatumObjavljivanja,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                p.TipPrevoza,
+                p.BrojSlobodnihMjesta,
+                p.NajatraktivnijaPonuda,
+                p.StatusPonude,
+                k.Ime,
+                k.Prezime,
+                k.NazivAgencije,
+                k.KorisnickoIme
+            FROM ponuda p
+            JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            WHERE p.idPONUDA = ?
+        `, [idPonude]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena." });
+        }
+
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Greška pri dobavljanju ponude:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
