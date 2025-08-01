@@ -1460,6 +1460,114 @@ app.get('/odbijene-rezervacije', authenticateToken, authenticateAgency, async (r
 });
 
 
+//Pregled liste četova korisnika
+app.get('/chatovi', authenticateToken, async (req, res) => {
+    const idKorisnik = req.user.idKORISNIK;
+
+    try {
+        const [chatovi] = await db.promise().query(`
+            SELECT 
+                c.idČET,
+                k1.idKORISNIK AS idSagovornik,
+                k1.Ime,
+                k1.Prezime,
+                k1.NazivAgencije,
+                k1.KorisnickoIme
+            FROM čet c
+            JOIN korisnik k1 ON (k1.idKORISNIK = IF(c.idKORISNIK1 = ?, c.idKORISNIK2, c.idKORISNIK1))
+            WHERE c.idKORISNIK1 = ? OR c.idKORISNIK2 = ?
+        `, [idKorisnik, idKorisnik, idKorisnik]);
+
+        res.json(chatovi);
+    } catch (err) {
+        console.error("Greška pri dohvaćanju četova:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+//Pregled poruka u jednom četu
+app.get('/chatovi/:idCET/poruke', authenticateToken, async (req, res) => {
+    const idKorisnik = req.user.idKORISNIK;
+    const idČET = req.params.idCET;
+
+    try {
+        // Provjera da li korisnik pripada tom četu
+        const [check] = await db.promise().query(`
+            SELECT * FROM čet WHERE idČET = ? AND (idKORISNIK1 = ? OR idKORISNIK2 = ?)
+        `, [idČET, idKorisnik, idKorisnik]);
+
+        if (check.length === 0) {
+            return res.status(403).json({ error: "Nemate pristup ovom četu." });
+        }
+
+        const [poruke] = await db.promise().query(`
+            SELECT 
+                p.idPORUKA,
+                p.Sadržaj,
+                p.VrijemeSlanja,
+                p.Pročitano,
+                p.idČET,
+                p.idPOŠILJALAC,
+                k.Ime AS ImePosiljaoca,
+                k.Prezime AS PrezimePosiljaoca,
+                k.KorisnickoIme AS KorisnickoIme,
+                k.NazivAgencije AS NazivAgencije
+            FROM poruka p
+            JOIN korisnik k ON k.idKORISNIK = p.idPOŠILJALAC
+            WHERE p.idČET = ?
+            ORDER BY p.VrijemeSlanja ASC
+        `, [idČET]);
+
+        res.json(poruke);
+    } catch (err) {
+        console.error("Greška pri dohvaćanju poruka:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
+//Slanje poruke ka drugom korisniku
+app.post('/poruka', authenticateToken, async (req, res) => {
+    const idKorisnik1 = req.user.idKORISNIK;
+    const { idKorisnik2, sadrzaj } = req.body;
+
+    if (!idKorisnik2 || !sadrzaj) {
+        return res.status(400).json({ error: "idKorisnik2 i sadržaj poruke su obavezni." });
+    }
+
+    try {
+        // Provjera postoji li već čet
+        const [existingChat] = await db.promise().query(`
+            SELECT idČET FROM čet
+            WHERE (idKORISNIK1 = ? AND idKORISNIK2 = ?) OR (idKORISNIK1 = ? AND idKORISNIK2 = ?)
+        `, [idKorisnik1, idKorisnik2, idKorisnik2, idKorisnik1]);
+
+        let idČET;
+
+        if (existingChat.length > 0) {
+            idČET = existingChat[0].idČET;
+        } else {
+            // Kreiraj novi čet
+            const [chatResult] = await db.promise().query(`
+                INSERT INTO čet (idKORISNIK1, idKORISNIK2) VALUES (?, ?)
+            `, [idKorisnik1, idKorisnik2]);
+            idČET = chatResult.insertId;
+        }
+
+        // Ubaci poruku sa pošiljaocem
+        await db.promise().query(`
+            INSERT INTO poruka (Sadržaj, VrijemeSlanja, Pročitano, idČET, idPOŠILJALAC)
+            VALUES (?, NOW(), 0, ?, ?)
+        `, [sadrzaj, idČET, idKorisnik1]);
+
+        res.status(201).json({ message: "Poruka uspješno poslana.", idČET });
+    } catch (err) {
+        console.error("Greška pri slanju poruke:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
 
 
 
