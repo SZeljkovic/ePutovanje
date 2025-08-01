@@ -1243,6 +1243,231 @@ app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req,
 });
 
 
+// Pregled svih zahtjeva za rezervacije (turisticka agencija)
+app.get('/zahtjevi-rezervacija', authenticateToken, authenticateAgency, async (req, res) => {
+    const idAgencije = req.user.idKORISNIK;
+
+    try {
+        const [rezervacije] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.Datum,
+                r.StatusRezervacije,
+                k.Ime AS ImeKorisnika,
+                k.Prezime AS PrezimeKorisnika,
+                p.Opis AS NazivPonude
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+            WHERE r.StatusRezervacije = 0 AND p.idKORISNIK = ?
+        `, [idAgencije]);
+
+        res.json(rezervacije);
+    } catch (err) {
+        console.error("Greška pri dobavljanju zahtjeva za rezervaciju:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+// Pregled pojedinacnog zahtjeva za rezervaciju (turisticka agencija)
+app.get('/zahtjevi-rezervacija/:id', authenticateToken, authenticateAgency, async (req, res) => {
+    const idAgencije = req.user.idKORISNIK;
+    const idRezervacije = req.params.id;
+
+    try {
+        const [rows] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.Datum,
+                r.BrojOdraslih,
+                r.BrojDjece,
+                r.StatusRezervacije,
+                k.Ime AS ImeKorisnika,
+                k.Prezime AS PrezimeKorisnika,
+                k.Email,
+                p.Opis AS NazivPonude,
+                p.Cijena AS CijenaPoOsobi
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+            WHERE r.idREZERVACIJA = ? AND p.idKORISNIK = ?
+        `, [idRezervacije, idAgencije]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Rezervacija nije pronađena ili ne pripada vašoj agenciji." });
+        }
+
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Greška pri dohvatanju rezervacije:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+//Prihvatanje ili odbijanje zahtjeva za rezervaciju (turisticka agencija)
+app.put('/zahtjevi-rezervacija/:id/status', authenticateToken, authenticateAgency, async (req, res) => {
+    const idAgencije = req.user.idKORISNIK;
+    const idRezervacije = req.params.id;
+    const { status } = req.query; // Status: 1 (prihvaćeno), 0 (na čekanju), -1 (odbijeno)
+
+    try {
+        if (status === undefined || ![1, 0, -1].includes(Number(status))) {
+            return res.status(400).json({ error: "Dozvoljene vrijednosti za status su: 1 (prihvaćeno), 0 (na čekanju) ili -1 (odbijeno)." });
+        }
+
+        const [rows] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.idKORISNIK AS idKlijenta,
+                r.StatusRezervacije,
+                p.Opis AS NazivPonude
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            WHERE r.idREZERVACIJA = ? AND p.idKORISNIK = ?
+        `, [idRezervacije, idAgencije]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Rezervacija nije pronađena ili ne pripada vašoj agenciji." });
+        }
+
+        const rezervacija = rows[0];
+
+        if (rezervacija.StatusRezervacije !== 0) {
+            return res.status(400).json({ error: "Ova rezervacija je već procesuirana." });
+        }
+
+        // Ažuriraj status rezervacije
+        await db.promise().query(`
+            UPDATE rezervacija
+            SET StatusRezervacije = ?
+            WHERE idREZERVACIJA = ?
+        `, [status, idRezervacije]);
+
+        // Tekst obavještenja
+        const akcija = status == 1 ? 'prihvaćena' : (status == -1 ? 'odbijena' : 'na čekanju');
+        const sadrzaj = `Vaša rezervacija za ponudu "${rezervacija.NazivPonude}" je ${akcija}.`;
+
+        // Insert u obavještenje
+        await db.promise().query(`
+            INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+            VALUES (?, NOW(), 0, ?)
+        `, [sadrzaj, rezervacija.idKlijenta]);
+
+        return res.json({ message: `Rezervacija je ${akcija}.` });
+
+    } catch (err) {
+        console.error("Greška pri odgovaranju na rezervaciju:", err);
+        return res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+// Pregled svih prihvacenih rezervacija (turistička agencija)
+app.get('/sve-rezervacije', authenticateToken, authenticateAgency, async (req, res) => {
+    const idAgencije = req.user.idKORISNIK;
+
+    try {
+        const [rezervacije] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.Datum,
+                r.StatusRezervacije,
+                k.Ime AS ImeKorisnika,
+                k.Prezime AS PrezimeKorisnika,
+                p.Opis AS NazivPonude
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+            WHERE p.idKORISNIK = ? AND r.StatusRezervacije = 1  
+        `, [idAgencije]);
+
+        if (rezervacije.length === 0) {
+            return res.status(404).json({ error: "Nema prihvaćenih rezervacija za ovu agenciju." });
+        }
+
+        res.json(rezervacije);
+    } catch (err) {
+        console.error("Greška pri dobavljanju svih prihvaćenih rezervacija:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+// Pregled pojedinacne rezervacije (turistička agencija)
+app.get('/sve-rezervacije/:id', authenticateToken, authenticateAgency, async (req, res) => {
+    const idAgencije = req.user.idKORISNIK;
+    const idRezervacije = req.params.id;
+
+    try {
+        const [rows] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.Datum,
+                r.BrojOdraslih,
+                r.BrojDjece,
+                r.StatusRezervacije,
+                k.Ime AS ImeKorisnika,
+                k.Prezime AS PrezimeKorisnika,
+                k.Email,
+                p.Opis AS NazivPonude,
+                p.Cijena AS CijenaPoOsobi
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+            WHERE r.idREZERVACIJA = ? AND p.idKORISNIK = ?
+        `, [idRezervacije, idAgencije]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Rezervacija nije pronađena ili ne pripada vašoj agenciji." });
+        }
+
+        res.json(rows[0]);
+    } catch (err) {
+        console.error("Greška pri dohvatanju pojedinačne rezervacije:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+// Pregled svih odbijenih rezervacija (turistič=cka agencija)
+app.get('/odbijene-rezervacije', authenticateToken, authenticateAgency, async (req, res) => {
+    const idAgencije = req.user.idKORISNIK;
+
+    try {
+        const [rezervacije] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.Datum,
+                r.BrojOdraslih,
+                r.BrojDjece,
+                r.StatusRezervacije,
+                k.Ime AS ImeKorisnika,
+                k.Prezime AS PrezimeKorisnika,
+                p.Opis AS NazivPonude,
+                p.Cijena AS CijenaPoOsobi
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+            WHERE r.StatusRezervacije = -1 AND p.idKORISNIK = ?
+        `, [idAgencije]);
+
+        res.json(rezervacije);
+    } catch (err) {
+        console.error("Greška pri dobavljanju odbijenih rezervacija:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
+
+
+
+
+
+
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
