@@ -1755,9 +1755,86 @@ app.get('/ponude/uporedi', authenticateToken, async (req, res) => {
     }
 });
 
+app.get('/ponude/filter', async (req, res) => {
+    try {
+        const {
+            minCijena,
+            maxCijena,
+            destinacija,
+            tipDestinacije,
+            datumPolaska,
+            datumPovratka,
+            najatraktivnije
+        } = req.query;
 
+        // Osnovni upit
+        let query = `
+            SELECT 
+                p.idPONUDA,
+                p.Cijena,
+                p.Opis,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                p.TipPrevoza,
+                p.BrojSlobodnihMjesta,
+                p.NajatraktivnijaPonuda,
+                k.NazivAgencije,
+                GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS Destinacije
+            FROM ponuda p
+            JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE p.StatusPonude = 1
+        `;
 
+        const params = [];
 
+        // Dodavanje filtera
+        if (minCijena) {
+            query += ` AND p.Cijena >= ?`;
+            params.push(minCijena);
+        }
+
+        if (maxCijena) {
+            query += ` AND p.Cijena <= ?`;
+            params.push(maxCijena);
+        }
+
+        if (destinacija) {
+            query += ` AND d.Naziv LIKE ?`;
+            params.push(`%${destinacija}%`);
+        }
+
+        if (tipDestinacije) {
+            query += ` AND d.Tip = ?`;
+            params.push(tipDestinacije);
+        }
+
+        if (datumPolaska) {
+            query += ` AND p.DatumPolaska >= ?`;
+            params.push(datumPolaska);
+        }
+
+        if (datumPovratka) {
+            query += ` AND p.DatumPovratka <= ?`;
+            params.push(datumPovratka);
+        }
+
+        if (najatraktivnije === 'true') {
+            query += ` AND p.NajatraktivnijaPonuda = 1`;
+        }
+
+        query += ` GROUP BY p.idPONUDA`;
+
+        const [ponude] = await db.promise().query(query, params);
+
+        res.json(ponude);
+
+    } catch (err) {
+        console.error("Greška pri filtriranju:", err);
+        res.status(500).json({ error: "Greška na serveru" });
+    }
+});
 
 
 
