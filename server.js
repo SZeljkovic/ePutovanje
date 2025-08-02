@@ -1837,9 +1837,68 @@ app.get('/ponude/filter', async (req, res) => {
 });
 
 
+// Get all reservations for the current user
+app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
+    const idKorisnik = req.user.idKORISNIK;
+
+    try {
+        const [rezervacije] = await db.promise().query(`
+            SELECT 
+                r.idREZERVACIJA,
+                r.Datum AS DatumRezervacije,
+                r.BrojOdraslih,
+                r.BrojDjece,
+                r.StatusRezervacije,
+                p.idPONUDA,
+                p.Cijena,
+                p.Opis AS OpisPonude,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                p.TipPrevoza,
+                k.NazivAgencije,
+                GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS Destinacije
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE r.idKORISNIK = ?
+            GROUP BY r.idREZERVACIJA
+            ORDER BY r.Datum DESC
+        `, [idKorisnik]);
+
+        // Format status text
+        const formattedReservations = rezervacije.map(rez => {
+            let statusText;
+            switch(rez.StatusRezervacije) {
+                case 1: statusText = 'Prihvaćeno'; break;
+                case 0: statusText = 'Na čekanju'; break;
+                case -1: statusText = 'Odbijeno'; break;
+                default: statusText = 'Nepoznat status';
+            }
+            
+            return {
+                ...rez,
+                StatusText: statusText,
+                UkupnaCijena: (rez.BrojOdraslih + rez.BrojDjece) * rez.Cijena
+            };
+        });
+
+        res.json({
+            message: "Lista vaših rezervacija",
+            rezervacije: formattedReservations
+        });
+
+    } catch (err) {
+        console.error("Greška pri dohvatu rezervacija:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom dohvata rezervacija." });
+    }
+});
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server radi na portu ${PORT}`);
 });
+ 
