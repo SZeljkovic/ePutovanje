@@ -1571,6 +1571,190 @@ app.post('/poruka', authenticateToken, async (req, res) => {
 
 
 
+app.post('/recenzija', authenticateToken, async (req, res) => {
+    const idKorisnik = req.user.idKORISNIK;
+    const { idPONUDA, Komentar, Ocjena } = req.body;
+
+    if (!idPONUDA || !Ocjena) {
+        return res.status(400).json({ error: "PONUDA i ocjena su obavezni." });
+    }
+
+    try {
+        // Provjera da li je već ostavio recenziju
+        const [postojeca] = await db.promise().query(`
+            SELECT * FROM recenzija WHERE idKORISNIK = ? AND idPONUDA = ?
+        `, [idKorisnik, idPONUDA]);
+
+        if (postojeca.length > 0) {
+            return res.status(409).json({ error: "Već ste ostavili recenziju za ovu ponudu." });
+        }
+
+        // Unos recenzije
+        await db.promise().query(`
+            INSERT INTO recenzija (idKORISNIK, idPONUDA, Komentar, Ocjena, DatumIVrijeme)
+            VALUES (?, ?, ?, ?, NOW())
+        `, [idKorisnik, idPONUDA, Komentar || null, Ocjena]);
+
+        res.status(201).json({ message: "Recenzija je uspješno dodana." });
+    } catch (err) {
+        console.error("Greška prilikom dodavanja recenzije:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
+app.get('/recenzije/:idPONUDA', authenticateToken, async (req, res) => {
+    const idPONUDA = req.params.idPONUDA;
+
+    try {
+        const [recenzije] = await db.promise().query(`
+            SELECT 
+                r.idKORISNIK,
+                r.Ocjena,
+                r.Komentar,
+                r.DatumIVrijeme,
+                k.KorisnickoIme
+            FROM recenzija r
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+            WHERE r.idPONUDA = ?
+            ORDER BY r.DatumIVrijeme DESC
+        `, [idPONUDA]);
+
+        res.json(recenzije);
+    } catch (err) {
+        console.error("Greška pri dohvaćanju recenzija:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
+
+app.post('/prijavi-problem', authenticateToken, async (req, res) => {
+    const idKORISNIK = req.user.idKORISNIK;
+    const { Naslov, Sadrzaj } = req.body;
+
+    if (!Naslov || !Sadrzaj) {
+        return res.status(400).json({ error: "Naslov i sadržaj su obavezni." });
+    }
+
+    try {
+        await db.promise().query(`
+            INSERT INTO problem (Naslov, Sadržaj, idKORISNIK)
+            VALUES (?, ?, ?)
+        `, [Naslov, Sadrzaj, idKORISNIK]);
+
+        res.status(201).json({ message: "Problem uspješno prijavljen." });
+    } catch (err) {
+        console.error("Greška pri prijavi problema:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+
+
+app.get('/problemi', authenticateToken, authenticateAdmin, async (req, res) => {
+    try {
+        const [problemi] = await db.promise().query(`
+            SELECT 
+                p.idPROBLEM,
+                p.Naslov,
+                p.Sadržaj,
+                p.idKORISNIK,
+                k.KorisnickoIme
+            FROM problem p
+            JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            ORDER BY p.idPROBLEM DESC
+        `);
+
+        res.json(problemi);
+    } catch (err) {
+        console.error("Greška pri dohvatu problema:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+
+// http://localhost:5000/ponude/uporedi?id1=1&id2=2
+app.get('/ponude/uporedi', authenticateToken, async (req, res) => {
+    const id1 = req.query.id1;
+    const id2 = req.query.id2;
+
+    if (!id1 || !id2) {
+        return res.status(400).json({ error: "Oba ID-a ponuda moraju biti navedena kao query parametri." });
+    }
+
+    try {
+        const query = `
+            SELECT 
+                p.idPONUDA,
+                p.Cijena,
+                p.Opis,
+                p.DatumObjavljivanja,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                p.TipPrevoza,
+                p.BrojSlobodnihMjesta,
+                p.NajatraktivnijaPonuda,
+                p.idKORISNIK,
+                d.idDESTINACIJA,
+                d.Naziv AS NazivDestinacije,
+                d.Opis AS OpisDestinacije,
+                d.Tip AS TipDestinacije
+            FROM 
+                ponuda p
+            JOIN 
+                ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN 
+                destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE 
+                p.idPONUDA IN (?, ?) AND p.StatusPonude = 1
+        `;
+
+        const [rows] = await db.promise().query(query, [id1, id2]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Nijedna ponuda nije pronađena." });
+        }
+
+        const ponudeMap = {};
+
+        for (const row of rows) {
+            if (!ponudeMap[row.idPONUDA]) {
+                ponudeMap[row.idPONUDA] = {
+                    idPONUDA: row.idPONUDA,
+                    Cijena: row.Cijena,
+                    Opis: row.Opis,
+                    DatumObjavljivanja: row.DatumObjavljivanja,
+                    DatumPolaska: row.DatumPolaska,
+                    DatumPovratka: row.DatumPovratka,
+                    TipPrevoza: row.TipPrevoza,
+                    BrojSlobodnihMjesta: row.BrojSlobodnihMjesta,
+                    NajatraktivnijaPonuda: !!row.NajatraktivnijaPonuda,
+                    idKORISNIK: row.idKORISNIK,
+                    Destinacije: []
+                };
+            }
+
+            ponudeMap[row.idPONUDA].Destinacije.push({
+                idDESTINACIJA: row.idDESTINACIJA,
+                Naziv: row.NazivDestinacije,
+                Opis: row.OpisDestinacije,
+                Tip: row.TipDestinacije
+            });
+        }
+
+        const ponude = Object.values(ponudeMap);
+        res.json({ ponuda1: ponude[0], ponuda2: ponude[1] });
+
+    } catch (err) {
+        console.error("Greška pri upoređivanju ponuda:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom upoređivanja ponuda." });
+    }
+});
+
 
 
 
