@@ -1939,6 +1939,71 @@ app.get('/moje-rezervacije/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// Rezervacija ponude iz pregleda
+app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
+    const { idPONUDA, BrojOdraslih, BrojDjece } = req.body;
+    const idKorisnik = req.user.idKORISNIK;
+
+    // Validacija
+    if (!idPONUDA || BrojOdraslih === undefined || BrojDjece === undefined) {
+        return res.status(400).json({ error: "idPONUDA, BrojOdraslih i BrojDjece su obavezni." });
+    }
+
+    try {
+        // 1. Provjera ponude
+        const [ponuda] = await db.promise().query(`
+            SELECT p.*, k.NazivAgencije 
+            FROM ponuda p
+            JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            WHERE p.idPONUDA = ? AND p.StatusPonude = 1
+        `, [idPONUDA]);
+
+        if (ponuda.length === 0) {
+            return res.status(404).json({ error: "Ponuda nije pronađena ili nije odobrena." });
+        }
+
+        // 2. Provjera kapaciteta
+        if (ponuda[0].BrojSlobodnihMjesta < (BrojOdraslih + BrojDjece)) {
+            return res.status(400).json({ 
+                error: "Nema dovoljno slobodnih mjesta.",
+                slobodnaMjesta: ponuda[0].BrojSlobodnihMjesta
+            });
+        }
+
+        // 3. Kreiranje rezervacije
+        const [rezervacija] = await db.promise().query(`
+            INSERT INTO rezervacija (Datum, BrojOdraslih, BrojDjece, StatusRezervacije, idPONUDA, idKORISNIK)
+            VALUES (NOW(), ?, ?, 0, ?, ?)
+        `, [BrojOdraslih, BrojDjece, idPONUDA, idKorisnik]);
+
+        // 4. Ažuriranje kapaciteta
+        await db.promise().query(`
+            UPDATE ponuda 
+            SET BrojSlobodnihMjesta = BrojSlobodnihMjesta - ? 
+            WHERE idPONUDA = ?
+        `, [BrojOdraslih + BrojDjece, idPONUDA]);
+
+        // 5. Obavijest agenciji
+        await db.promise().query(`
+            INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+            VALUES (?, NOW(), 0, ?)
+        `, [
+            `Nova rezervacija za ponudu: ${ponuda[0].Opis}`,
+            ponuda[0].idKORISNIK
+        ]);
+
+        res.status(201).json({
+            message: "Rezervacija uspješno kreirana",
+            idREZERVACIJA: rezervacija.insertId,
+            ukupnaCijena: (BrojOdraslih + BrojDjece) * ponuda[0].Cijena
+        });
+
+    } catch (err) {
+        console.error("Greška pri rezervaciji:", err);
+        res.status(500).json({ error: "Greška na serveru" });
+    }
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
