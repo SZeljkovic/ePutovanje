@@ -483,7 +483,6 @@ app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, re
 });
 
 
-
 app.post('/forgot-password', async (req, res) => {
     const { KorisnickoIme } = req.body;
 
