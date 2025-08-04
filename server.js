@@ -1895,6 +1895,50 @@ app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
     }
 });
 
+// Get details for a specific reservation
+app.get('/moje-rezervacije/:id', authenticateToken, async (req, res) => {
+    const idRezervacija = req.params.id;
+    const idKorisnik = req.user.idKORISNIK;
+
+    try {
+        // Get basic reservation info
+        const [rezervacija] = await db.promise().query(`
+            SELECT 
+                r.*,
+                p.*,
+                k.NazivAgencije
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            WHERE r.idREZERVACIJA = ? AND r.idKORISNIK = ?
+        `, [idRezervacija, idKorisnik]);
+
+        if (rezervacija.length === 0) {
+            return res.status(404).json({ error: "Rezervacija nije pronađena." });
+        }
+
+        // Get destinations for this offer
+        const [destinacije] = await db.promise().query(`
+            SELECT d.* 
+            FROM destinacija d
+            JOIN ponuda_has_destinacija phd ON d.idDESTINACIJA = phd.idDESTINACIJA
+            WHERE phd.idPONUDA = ?
+        `, [rezervacija[0].idPONUDA]);
+
+        // Format response
+        const response = {
+            ...rezervacija[0],
+            Destinacije: destinacije,
+            UkupnaCijena: (rezervacija[0].BrojOdraslih + rezervacija[0].BrojDjece) * rezervacija[0].Cijena
+        };
+
+        res.json(response);
+
+    } catch (err) {
+        console.error("Greška pri dohvatu detalja rezervacije:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
