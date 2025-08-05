@@ -1836,7 +1836,6 @@ app.get('/ponude/filter', async (req, res) => {
 });
 
 
-// Get all reservations for the current user
 app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
     const idKorisnik = req.user.idKORISNIK;
 
@@ -1844,7 +1843,7 @@ app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
         const [rezervacije] = await db.promise().query(`
             SELECT 
                 r.idREZERVACIJA,
-                r.Datum AS DatumRezervacije,
+                r.Datum,
                 r.BrojOdraslih,
                 r.BrojDjece,
                 r.StatusRezervacije,
@@ -1863,34 +1862,25 @@ app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
             JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
             WHERE r.idKORISNIK = ?
             GROUP BY r.idREZERVACIJA
-            ORDER BY r.Datum DESC
         `, [idKorisnik]);
 
-        // Format status text
-        const formattedReservations = rezervacije.map(rez => {
-            let statusText;
-            switch(rez.StatusRezervacije) {
-                case 1: statusText = 'Prihvaćeno'; break;
-                case 0: statusText = 'Na čekanju'; break;
-                case -1: statusText = 'Odbijeno'; break;
-                default: statusText = 'Nepoznat status';
-            }
-            
-            return {
-                ...rez,
-                StatusText: statusText,
-                UkupnaCijena: (rez.BrojOdraslih + rez.BrojDjece) * rez.Cijena
-            };
-        });
+        const rezervacijeSaStatusom = rezervacije.map(r => ({
+            ...r,
+            StatusText: 
+                r.StatusRezervacije === 1 ? 'Odobreno' :
+                r.StatusRezervacije === 0 ? 'Na čekanju' :
+                r.StatusRezervacije === -1 ? 'Odbijeno' :
+                r.StatusRezervacije === -2 ? 'Otkazano' : 'Nepoznato',
+            UkupnaCijena: (r.BrojOdraslih + r.BrojDjece) * r.Cijena
+        }));
 
         res.json({
             message: "Lista vaših rezervacija",
-            rezervacije: formattedReservations
+            rezervacije: rezervacijeSaStatusom
         });
-
     } catch (err) {
-        console.error("Greška pri dohvatu rezervacija:", err);
-        res.status(500).json({ error: "Greška na serveru prilikom dohvata rezervacija." });
+        console.error(err);
+        res.status(500).json({ error: "Greška na serveru" });
     }
 });
 
@@ -2000,6 +1990,78 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
 
     } catch (err) {
         console.error("Greška pri rezervaciji:", err);
+        res.status(500).json({ error: "Greška na serveru" });
+    }
+});
+
+
+// Otkazivanje rezervacije (bez polja RazlogOtkazivanja)
+app.put('/moje-rezervacije/:id/otkazi', authenticateToken, async (req, res) => {
+    const idRezervacija = req.params.id;
+    const { razlogOtkazivanja } = req.body;
+    const idKorisnik = req.user.idKORISNIK;
+
+    if (!razlogOtkazivanja) {
+        return res.status(400).json({ error: "Razlog otkazivanja je obavezan." });
+    }
+
+    try {
+        // 1. Provjera rezervacije
+        const [rezervacija] = await db.promise().query(`
+            SELECT r.*, p.idKORISNIK as idAgencije, p.Opis as nazivPonude
+            FROM rezervacija r
+            JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            WHERE r.idREZERVACIJA = ? AND r.idKORISNIK = ?
+        `, [idRezervacija, idKorisnik]);
+
+        if (rezervacija.length === 0) {
+            return res.status(404).json({ error: "Rezervacija nije pronađena." });
+        }
+
+        // 2. Provjera statusa
+        if (rezervacija[0].StatusRezervacije !== 0 && rezervacija[0].StatusRezervacije !== 1) {
+            return res.status(400).json({ error: "Rezervacija se ne može otkazati." });
+        }
+
+        // 3. Otkazivanje rezervacije (samo promjena statusa)
+        await db.promise().query(`
+            UPDATE rezervacija 
+            SET StatusRezervacije = -2
+            WHERE idREZERVACIJA = ?
+        `, [idRezervacija]);
+
+        // 4. Vraćanje kapaciteta
+        await db.promise().query(`
+            UPDATE ponuda 
+            SET BrojSlobodnihMjesta = BrojSlobodnihMjesta + ?
+            WHERE idPONUDA = ?
+        `, [rezervacija[0].BrojOdraslih + rezervacija[0].BrojDjece, rezervacija[0].idPONUDA]);
+
+        // 5. Obavještenje agenciji (sa razlogom)
+        await db.promise().query(`
+            INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+            VALUES (?, NOW(), 0, ?)
+        `, [
+            `Rezervacija #${idRezervacija} otkazana. Razlog: ${razlogOtkazivanja}`,
+            rezervacija[0].idAgencije
+        ]);
+
+        // 6. Obavještenje klijentu
+        await db.promise().query(`
+            INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+            VALUES (?, NOW(), 0, ?)
+        `, [
+            `Otkazali ste rezervaciju #${idRezervacija}`,
+            idKorisnik
+        ]);
+
+        res.json({ 
+            message: "Rezervacija uspješno otkazana.",
+            vraceniKapacitet: rezervacija[0].BrojOdraslih + rezervacija[0].BrojDjece
+        });
+
+    } catch (err) {
+        console.error("Greška pri otkazivanju:", err);
         res.status(500).json({ error: "Greška na serveru" });
     }
 });
