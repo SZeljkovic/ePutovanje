@@ -4,12 +4,16 @@ import Offers from '../components/Offers/Offers';
 import Title from '../components/Title/Title';
 import About from '../components/About/About';
 import Footer from '../components/Footer/Footer';
+import UpcomingTrips from '../components/UpcomingTrips/UpcomingTrips';
+
 
 const Home = () => {
   return (
     <>
       <Hero />
       <div className='container'>
+        <Title subTitle='Ponude'  />
+        <UpcomingTrips />
         <Title subTitle='Nudimo:' title='Najatraktivnije ponude!' />
         <Offers />
         <About />
