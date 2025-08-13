@@ -18,7 +18,6 @@ const Home = () => {
         <Offers />
         <About />
         <Title subTitle='Kontakt: ' title='Slobodno nam se javi 📞' />
-        <Footer />
       </div>
     </>
   );
