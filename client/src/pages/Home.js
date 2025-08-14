@@ -5,6 +5,8 @@ import Title from '../components/Title/Title';
 import About from '../components/About/About';
 import Footer from '../components/Footer/Footer';
 import UpcomingTrips from '../components/UpcomingTrips/UpcomingTrips';
+import Testimonials from '../components/Testimonials/Testimonials';
+import Contact from '../components/Contact/Contact';
 
 
 const Home = () => {
@@ -16,8 +18,12 @@ const Home = () => {
         <UpcomingTrips />
         <Title subTitle='Nudimo:' title='Najatraktivnije ponude!' />
         <Offers />
+        <Title subTitle='O nama:' title='Zbog vašeg ugodnijeg putovanja!' />
         <About />
+        <Title subTitle='Šta naši klijenti kažu:' />
+        <Testimonials/>
         <Title subTitle='Kontakt: ' title='Slobodno nam se javi 📞' />
+        <Contact/>
       </div>
     </>
   );
