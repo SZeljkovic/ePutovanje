@@ -1,5 +1,6 @@
 .upcoming-trips {
   padding: 80px 0;
+  padding-left: 5%;
   background-color: #f8f9fa;
 }
 
@@ -164,6 +165,7 @@
   align-items: flex-start; 
   gap: 6px;
   white-space: nowrap;
+  min-width: 100px;
 }
 
 .price-label {
@@ -173,6 +175,9 @@
 }
 
 .original-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
   font-size: 16px;
   color: #999;
   text-decoration: line-through;
@@ -180,15 +185,20 @@
 }
 
 .current-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
   font-size: 20px;
   color: #e74c3c;
   font-weight: 700;
 }
 
 .currency {
+  display: inline-block;
   font-size: 14px;
   color: #666;
   font-weight: 500;
+  margin-left: 4px;
 }
 
 .trip-actions {
@@ -247,7 +257,6 @@
   color: #4CAF50;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .section-header {
     flex-direction: column;
