@@ -300,6 +300,10 @@ const AdminHome = () => {
     } else if (activeSection === "offers") { // NOVO
       loadAllOffers();
     }
+    else if (activeSection === "dashboard") {
+    loadAllUsers(); // ✅ dodaj ovo
+    loadSuspendedUsers(); // ✅ ako koristiš i suspendedUsers.length
+  }
   }, [activeSection, token]);
 
   const getTipKorisnikaText = (tip) => {
