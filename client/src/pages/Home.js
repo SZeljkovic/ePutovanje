@@ -7,6 +7,7 @@ import Footer from '../components/Footer/Footer';
 import UpcomingTrips from '../components/UpcomingTrips/UpcomingTrips';
 import Testimonials from '../components/Testimonials/Testimonials';
 import Contact from '../components/Contact/Contact';
+import Navbar from '../components/Navbar/Navbar';
 
 
 const Home = () => {
@@ -14,6 +15,7 @@ const Home = () => {
     <>
       <Hero />
       <div className='container'>
+        <Navbar />
         <Title subTitle='Ponude'  />
         <UpcomingTrips />
         <Title subTitle='Nudimo:' title='Najatraktivnije ponude!' />

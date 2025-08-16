@@ -11,7 +11,7 @@ import Register from './pages/Register';
 const App = () => {
   return (
     <>
-      <Navbar />
+      {/*<Navbar />*/}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
