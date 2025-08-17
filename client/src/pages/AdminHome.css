@@ -1,4 +1,3 @@
-/* === Utility Classes === */
 .text-center {
   text-align: center;
 }
@@ -25,7 +24,6 @@
   color: #fff;
 }
 
-/* === Animacije === */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -48,7 +46,6 @@
   }
 }
 
-/* Loading Spinner */
 .loading-spinner {
   display: inline-block;
   width: 20px;
@@ -59,7 +56,6 @@
   animation: spin 1s linear infinite;
 }
 
-/* Fade-in animacija za sekcije */
 .dashboard-section,
 .profile-section,
 .users-section,
@@ -68,7 +64,6 @@
   animation: fadeInUp 0.5s ease-out;
 }
 
-/* === Layout === */
 .admin-page {
   background-color: #1e1e1e;
   min-height: 100vh;
@@ -80,88 +75,15 @@
 .admin-container {
   display: flex;
   flex-direction: row;
-  /* osiguraj horizontalni layout */
   justify-content: flex-start;
-  /* gurni sve lijevo */
   align-items: stretch;
-  /* da sidebar i content budu iste visine */
   width: 100%;
   min-height: calc(100vh - 60px);
-  /* minus header */
 }
 
-
-/* === Header === */
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #2c2c2c;
-  height: 60px;
-  padding-right: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-left img {
-  display: block;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.admin-header button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 15px;
-  cursor: pointer;
-  padding: 8px 14px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.admin-header button:hover {
-  background-color: #3a3a3a;
-}
-
-.logout-btn-header {
-  background-color: #d32f2f !important;
-  color: white;
-  font-weight: 600;
-}
-
-.logout-btn-header:hover {
-  background-color: #b71c1c !important;
-}
-
-.notif-btn {
-  font-size: 20px;
-  position: relative;
-}
-
-.notif-btn::after {
-  content: "3";
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ff9800;
-  color: white;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 50%;
-}
-
-/* === Sidebar === */
 .admin-sidebar {
   background-color: #2c2c2c;
   padding: 30px 0 30px 0;
-  /* Samo top i bottom padding */
   width: 280px;
   min-width: 280px;
   flex-shrink: 0;
@@ -176,18 +98,15 @@
   text-align: center;
   border-bottom: 2px solid #ff9800;
   padding: 0 20px 15px 20px;
-  /* Dodaj horizontalni padding samo za naslov */
   font-size: 24px;
 }
 
-/* Navigacija u sidebaru */
 .admin-nav {
   display: flex;
   flex-direction: column;
   gap: 15px;
   flex: 1;
   padding: 0 20px;
-  /* Dodaj padding samo za navigaciju */
 }
 
 .menu-item {
@@ -236,7 +155,6 @@
   background-color: #fff;
 }
 
-/* Podmeni */
 .submenu {
   display: flex;
   flex-direction: column;
@@ -263,10 +181,8 @@
   color: #fff;
 }
 
-/* Logout dugme u sidebaru */
 .logout-btn {
   margin: auto 20px 0 20px;
-  /* Dodaj horizontalni margin */
   background-color: #d32f2f !important;
   text-align: center;
   padding: 15px 20px;
@@ -282,12 +198,11 @@
   transform: translateX(0) !important;
 }
 
-/* === Main Content === */
 .admin-content {
   flex: 1;
   background-color: #1e1e1e;
   padding: 40px;
-  overflow-y: auto;
+  /*overflow-y: auto;*/
   min-height: 100%;
 }
 
@@ -299,23 +214,30 @@
   font-size: 28px;
 }
 
-/* === Poruke === */
 .error-message {
-  background-color: #d32f2f;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  border-left: 4px solid #f44336;
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .success-message {
-  background-color: #388e3c;
-  color: white;
-  padding: 15px 20px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  border-left: 4px solid #4caf50;
+  background-color: #f8f9fa;
+  color: #333;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .empty-state {
@@ -334,7 +256,6 @@
   font-size: 16px;
 }
 
-/* === Dashboard === */
 .dashboard-section h2 {
   margin-bottom: 40px;
 }
@@ -376,64 +297,6 @@
   margin: 0;
 }
 
-/* === Profile === */
-.profile-section {
-  max-width: 700px;
-}
-
-.profile-view {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.profile-info {
-  background: linear-gradient(135deg, #2c2c2c 0%, #3a3a3a 100%);
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.profile-info p {
-  margin: 15px 0;
-  font-size: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #4a4a4a;
-}
-
-.profile-info p:last-child {
-  border-bottom: none;
-}
-
-.profile-info strong {
-  color: #ff9800;
-  font-weight: 600;
-}
-
-.edit-btn {
-  background: linear-gradient(135deg, #ff9800 0%, #e68900 100%);
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  align-self: flex-start;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
-}
-
-.edit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
-}
-
-/* === Formulari === */
-.profile-form,
 .admin-form {
   display: flex;
   flex-direction: column;
@@ -441,7 +304,6 @@
   max-width: 600px;
 }
 
-.profile-form input,
 .admin-form input,
 .search-bar input {
   width: 100%;
@@ -454,13 +316,11 @@
   transition: all 0.3s ease;
 }
 
-.profile-form input::placeholder,
 .admin-form input::placeholder,
 .search-bar input::placeholder {
   color: #bbb;
 }
 
-.profile-form input:focus,
 .admin-form input:focus,
 .search-bar input:focus {
   outline: none;
@@ -468,7 +328,6 @@
   box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
 }
 
-/* Dugmad u formama */
 .form-buttons {
   display: flex;
   gap: 15px;
@@ -531,7 +390,6 @@
   box-shadow: none;
 }
 
-/* === Users Section === */
 .search-bar {
   margin-bottom: 30px;
 }
@@ -585,11 +443,20 @@
   box-shadow: 0 8px 25px rgba(255, 152, 0, 0.2);
 }
 
+.user-info {
+  flex: 1; 
+}
+
 .user-info h4 {
   color: #ff9800;
-  margin-bottom: 15px;
   font-size: 20px;
   font-weight: 600;
+  margin: 0 35px 0 0;
+  white-space: normal; 
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+  word-break: break-all; 
+  line-height: 1.2; 
 }
 
 .user-info p {
@@ -597,13 +464,13 @@
   font-size: 14px;
   color: #ddd;
   display: flex;
-  gap: 10px;
+  /*gap: 10px;*/
 }
 
 .user-info strong {
   color: #fff;
   font-weight: 600;
-  min-width: 120px;
+  min-width: 110px;
 }
 
 .user-actions {
@@ -667,7 +534,6 @@
   box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
 }
 
-/* === Responsive Design === */
 @media (max-width: 1024px) {
   .admin-container {
     flex-direction: column;
@@ -840,7 +706,6 @@
     padding-right: 15px;
 }
 
-/* Stilovi za scrollbar - preuzeto iz .users-table */
 .requests-list::-webkit-scrollbar,
 .offers-list::-webkit-scrollbar {
     width: 10px;
@@ -926,7 +791,6 @@
     transition: all 0.3s ease;
 }
 
-/* Postojeće klase za dugmad preuzete iz tvog koda */
 .offer-actions .approve-btn {
     background: linear-gradient(135deg, #388e3c, #2e7d32);
     color: white;
@@ -957,7 +821,6 @@
     margin-top: 20px;
 }
 
-/* === Responsive Design za ponude === */
 @media (max-width: 768px) {
     .offer-card {
         flex-direction: column;
@@ -967,5 +830,314 @@
     .offer-actions {
         flex-direction: column;
         width: 100%;
+    }
+}
+
+.destinations-section {
+    animation: fadeInUp 0.5s ease-out;
+    padding: 0;
+}
+
+.destinations-section h2 {
+    color: #fff;
+    margin-bottom: 30px;
+    border-bottom: 3px solid #ff9800;
+    padding-bottom: 15px;
+    font-size: 28px;
+}
+
+.add-destination-form {
+    background: linear-gradient(135deg, #2c2c2c 0%, #3a3a3a 100%);
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.add-destination-form:hover {
+    border-color: #ff9800;
+    box-shadow: 0 8px 25px rgba(255, 152, 0, 0.1);
+}
+
+.add-destination-form h3 {
+    color: #ff9800;
+    margin: 0 0 25px 0;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid #ff9800;
+    padding-bottom: 10px;
+}
+
+.destinations-list {
+    margin-top: 0;
+}
+
+.destinations-list h3 {
+    color: #ff9800;
+    margin: 0 0 25px 0;
+    font-size: 22px;
+    font-weight: 600;
+    border-bottom: 2px solid #ff9800;
+    padding-bottom: 10px;
+}
+
+.destinations-table {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+.destinations-table::-webkit-scrollbar {
+    width: 10px;
+}
+
+.destinations-table::-webkit-scrollbar-track {
+    background: #2c2c2c;
+    border-radius: 10px;
+}
+
+.destinations-table::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #ff9800, #e68900);
+    border-radius: 10px;
+}
+
+.destinations-table::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #e68900, #d57c00);
+}
+
+/* Destinacija karta */
+.destination-card {
+    background: linear-gradient(135deg, #2c2c2c 0%, #3a3a3a 100%);
+    padding: 25px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.destination-card:hover {
+    border-color: #ff9800;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 152, 0, 0.2);
+}
+
+.destination-info {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.destination-info h4 {
+    color: #ff9800;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.2;
+}
+
+.destination-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #ddd;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.destination-info strong {
+    color: #fff;
+    font-weight: 600;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.destination-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 120px;
+}
+
+.destination-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.destination-actions .delete-btn {
+    background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    color: white;
+    box-shadow: 0 2px 10px rgba(211, 47, 47, 0.3);
+}
+
+.destination-actions .delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+}
+
+.admin-form select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #3a3a3a;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #2c2c2c;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-form select:focus {
+    outline: none;
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.admin-form select option {
+    background-color: #2c2c2c;
+    color: #fff;
+    padding: 10px;
+}
+
+.admin-form textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #3a3a3a;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #2c2c2c;
+    color: #fff;
+    resize: vertical;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    min-height: 120px;
+}
+
+.admin-form textarea::placeholder {
+    color: #bbb;
+}
+
+.admin-form textarea:focus {
+    outline: none;
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+/* Responsive dizajn za destinacije */
+@media (max-width: 1024px) {
+    .destination-card {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .destination-info {
+        margin-right: 0;
+    }
+
+    .destination-actions {
+        flex-direction: row;
+        justify-content: center;
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .destinations-section h2,
+    .add-destination-form h3,
+    .destinations-list h3 {
+        font-size: 20px;
+    }
+
+    .add-destination-form {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .destinations-table {
+        max-height: 50vh;
+    }
+
+    .destination-card {
+        padding: 20px 15px;
+    }
+
+    .destination-info h4 {
+        font-size: 18px;
+    }
+
+    .destination-info p {
+        font-size: 13px;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .destination-info strong {
+        min-width: auto;
+    }
+
+    .destination-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .admin-form textarea {
+        min-height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .destinations-section h2,
+    .add-destination-form h3,
+    .destinations-list h3 {
+        font-size: 18px;
+    }
+
+    .add-destination-form {
+        padding: 15px;
+        margin-bottom: 25px;
+    }
+
+    .destination-card {
+        padding: 15px;
+    }
+
+    .destination-info h4 {
+        font-size: 16px;
+    }
+
+    .destination-info p {
+        font-size: 12px;
+    }
+
+    .admin-form input,
+    .admin-form select,
+    .admin-form textarea {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .admin-form textarea {
+        min-height: 80px;
+    }
+
+    .admin-form button {
+        padding: 12px;
+        font-size: 14px;
     }
 }
