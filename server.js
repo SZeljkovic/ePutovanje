@@ -598,6 +598,7 @@ app.get('/all-profiles', authenticateToken, authenticateAdmin, async (req, res) 
                 StatusNaloga, 
                 Email
             FROM korisnik
+            WHERE StatusNaloga = 1
         `;
 
         const [rows] = await db.promise().query(query);
@@ -936,9 +937,9 @@ app.get('/ponude', async (req, res) => {
                 d.Tip AS TipDestinacije
             FROM 
                 ponuda p
-            JOIN 
+            LEFT JOIN 
                 ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
-            JOIN 
+            LEFT JOIN 
                 destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
             WHERE 
                 p.StatusPonude = 1
@@ -1112,6 +1113,32 @@ app.post('/dodaj-destinaciju', authenticateToken, authenticateAdmin, async (req,
     } catch (err) {
         console.error("Greška pri dodavanju destinacije:", err);
         res.status(500).json({ error: "Greška na serveru prilikom dodavanja destinacije." });
+    }
+});
+
+app.delete('/destinacija/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+
+        const [existing] = await db.promise().query(
+            "SELECT * FROM destinacija WHERE idDESTINACIJA = ?", 
+            [id]
+        );
+
+        if (existing.length === 0) {
+            return res.status(404).json({ error: "Destinacija nije pronađena." });
+        }
+
+        await db.promise().query(
+            "DELETE FROM destinacija WHERE idDESTINACIJA = ?", 
+            [id]
+        );
+
+        res.json({ message: "Destinacija je uspješno obrisana." });
+    } catch (err) {
+        console.error("Greška pri brisanju destinacije:", err);
+        res.status(500).json({ error: "Greška na serveru prilikom brisanja destinacije." });
     }
 });
 

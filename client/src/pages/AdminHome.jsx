@@ -3,7 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./AdminHome.css";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/logo3.png";
+import Header from "../components/Header/Header";
+import MyProfile from "../components/MyProfile/MyProfile";
 
 
 const AdminHome = () => {
@@ -16,14 +17,6 @@ const AdminHome = () => {
   const [success, setSuccess] = useState("");
 
   const [profile, setProfile] = useState(null);
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    Ime: "",
-    Prezime: "",
-    Email: "",
-    StaraLozinka: "",
-    NovaLozinka: ""
-  });
 
   const [allUsers, setAllUsers] = useState([]);
   const [suspendedUsers, setSuspendedUsers] = useState([]);
@@ -41,8 +34,40 @@ const AdminHome = () => {
     Email: ""
   });
 
-  useEffect(() => {
+  const [destinations, setDestinations] = useState([]);
+  const [destinationForm, setDestinationForm] = useState({
+    Naziv: "",
+    Opis: "",
+    Tip: ""
+  });
 
+  
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  const handleSectionChange = (newSection) => {
+    setActiveSection(newSection);
+    setError("");
+    setSuccess("");
+  };
+
+
+  useEffect(() => {
     if (!token || !user) {
       navigate("/login");
       return;
@@ -55,27 +80,6 @@ const AdminHome = () => {
     }
 
   }, [token, user, navigate, isLoading]);
-
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("http://localhost:5000/profile", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setProfile(res.data.user);
-      setProfileForm({
-        Ime: res.data.user.Ime,
-        Prezime: res.data.user.Prezime,
-        Email: res.data.user.Email,
-        StaraLozinka: "",
-        NovaLozinka: ""
-      });
-    } catch (err) {
-      setError("Greška pri učitavanju profila");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadAllUsers = async () => {
     try {
@@ -112,8 +116,8 @@ const AdminHome = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess("Nalog je uspješno odobren.");
-      loadAgencyRequests(); // Ponovo učitaj listu zahtjeva
-      loadAllUsers(); // Ažuriraj listu svih korisnika
+      loadAgencyRequests();
+      loadAllUsers();
     } catch (err) {
       setError(err.response?.data?.error || "Greška pri odobravanju naloga.");
     } finally {
@@ -130,27 +134,6 @@ const AdminHome = () => {
       setSuspendedUsers(res.data.suspendovaniNalozi);
     } catch (err) {
       setError("Greška pri učitavanju suspendovanih naloga");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleProfileUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      setError("");
-      setSuccess("");
-
-      await axios.put("http://localhost:5000/edit-profile", profileForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setSuccess("Profil je uspešno ažuriran");
-      setEditingProfile(false);
-      loadProfile();
-    } catch (err) {
-      setError(err.response?.data?.error || "Greška pri ažuriranju profila");
     } finally {
       setLoading(false);
     }
@@ -256,11 +239,65 @@ const AdminHome = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Ponuda je uspješno ${action}.`);
-      loadOfferRequests(); // Ponovo učitaj zahtjeve
+      loadOfferRequests();
+      loadAllOffers();
     } catch (err) {
       setError(err.response?.data?.error || "Greška pri ažuriranju statusa ponude.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadDestinations = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:5000/destinacije", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setDestinations(res.data);
+    } catch (err) {
+      setError("Greška pri učitavanju destinacija");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddDestination = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      await axios.post("http://localhost:5000/dodaj-destinaciju", destinationForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setSuccess("Destinacija je uspješno dodana");
+      setDestinationForm({
+        Naziv: "",
+        Opis: "",
+        Tip: ""
+      });
+      loadDestinations();
+    } catch (err) {
+      setError(err.response?.data?.error || "Greška pri dodavanju destinacije");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteDestination = async (destinationId) => {
+    if (window.confirm("Da li ste sigurni da želite da obrišete ovu destinaciju?")) {
+      try {
+        await axios.delete(`http://localhost:5000/destinacija/${destinationId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSuccess("Destinacija je uspješno obrisana");
+        loadDestinations();
+      } catch (err) {
+        setError(err.response?.data?.error || "Greška pri brisanju destinacije");
+      }
     }
   };
 
@@ -287,23 +324,22 @@ const AdminHome = () => {
 
 
   useEffect(() => {
-    if (activeSection === "profile") {
-      loadProfile();
-    } else if (activeSection === "users") {
+    if (activeSection === "users") {
       loadAllUsers();
     } else if (activeSection === "suspended") {
       loadSuspendedUsers();
     } else if (activeSection === "requests") {
       loadAgencyRequests();
-    } else if (activeSection === "offer-requests") { // NOVO
+    } else if (activeSection === "offer-requests") {
       loadOfferRequests();
-    } else if (activeSection === "offers") { // NOVO
+    } else if (activeSection === "offers") {
       loadAllOffers();
+    } else if (activeSection === "dashboard") {
+      loadAllUsers();
+      loadSuspendedUsers();
+    } else if (activeSection === "destinations") {
+      loadDestinations();
     }
-    else if (activeSection === "dashboard") {
-    loadAllUsers(); // ✅ dodaj ovo
-    loadSuspendedUsers(); // ✅ ako koristiš i suspendedUsers.length
-  }
   }, [activeSection, token]);
 
   const getTipKorisnikaText = (tip) => {
@@ -326,19 +362,11 @@ const AdminHome = () => {
 
   return (
     <div className="admin-page">
-      {/* <Navbar /> */}
-      <header className="admin-header">
-        <div className="header-left">
-          <img src={logo} alt="Logo" className="h-44" />
-        </div>
-
-        <div className="header-right">
-          <button onClick={() => setActiveSection("profile")}>Moj Profil</button>
-          <button className="notif-btn" onClick={() => alert("Notifikacije će biti ovdje 😉")}>🔔</button>
-          <button className="logout-btn-header" onClick={() => { logout(); navigate("/"); }}>Odjavi se</button>
-        </div>
-      </header>
-
+      <Header
+        setActiveSection={setActiveSection}
+        logout={logout}
+        navigate={navigate}
+      />
 
       <div className="admin-container">
         <div className="admin-sidebar">
@@ -346,7 +374,7 @@ const AdminHome = () => {
           <nav className="admin-nav">
             <div
               className={activeSection === "dashboard" ? "menu-item active" : "menu-item"}
-              onClick={() => setActiveSection("dashboard")}
+              onClick={() => handleSectionChange("dashboard")}
             >
               Dashboard
             </div>
@@ -354,22 +382,22 @@ const AdminHome = () => {
             <div className="menu-item">
               Nalozi
               <div className="submenu">
-                <div onClick={() => setActiveSection("users")}>Svi korisnici</div>
-                <div onClick={() => setActiveSection("suspended")}>Suspendovani nalozi</div>
-                <div onClick={() => setActiveSection("requests")}>Zahtjevi</div>
-                <div onClick={() => setActiveSection("create-admin")}>Kreiraj Admin</div>
+                <div onClick={() => handleSectionChange("users")}>Svi korisnici</div>
+                <div onClick={() => handleSectionChange("suspended")}>Suspendovani nalozi</div>
+                <div onClick={() => handleSectionChange("requests")}>Zahtjevi</div>
+                <div onClick={() => handleSectionChange("create-admin")}>Kreiraj Admin</div>
               </div>
             </div>
 
             <div className="menu-item">
               Ponude
               <div className="submenu">
-                <div onClick={() => setActiveSection("offers")}>Sve ponude</div>
-                <div onClick={() => setActiveSection("offer-requests")}>Zahtjevi</div>
+                <div onClick={() => handleSectionChange("offers")}>Sve ponude</div>
+                <div onClick={() => handleSectionChange("offer-requests")}>Zahtjevi</div>
               </div>
             </div>
 
-            <div className="menu-item" onClick={() => setActiveSection("destinations")}>
+            <div className="menu-item" onClick={() => handleSectionChange("destinations")}>
               Destinacije
             </div>
           </nav>
@@ -408,87 +436,13 @@ const AdminHome = () => {
 
           {/* Moj Profil */}
           {activeSection === "profile" && (
-            <div className="profile-section">
-              <h2>Moj Profil</h2>
-              {loading ? (
-                <p>Učitavanje...</p>
-              ) : profile ? (
-                <div className="profile-content">
-                  {!editingProfile ? (
-                    <div className="profile-view">
-                      <div className="profile-info">
-                        <p><strong>Ime:</strong> {profile.Ime}</p>
-                        <p><strong>Prezime:</strong> {profile.Prezime}</p>
-                        <p><strong>Email:</strong> {profile.Email}</p>
-                        {profile.NazivAgencije && <p><strong>Naziv Agencije:</strong> {profile.NazivAgencije}</p>}
-                        {profile.DatumRodjenja && <p><strong>Datum rođenja:</strong> {new Date(profile.DatumRodjenja).toLocaleDateString()}</p>}
-                        <p><strong>Korisničko ime:</strong> {profile.KorisnickoIme}</p>
-                        <p><strong>Tip korisnika:</strong> {getTipKorisnikaText(profile.TipKorisnika)}</p>
-                      </div>
-                      <button onClick={() => setEditingProfile(true)} className="edit-btn">
-                        Uredi Profil
-                      </button>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleProfileUpdate} className="profile-form">
-                      <input
-                        type="text"
-                        placeholder="Ime"
-                        value={profileForm.Ime}
-                        onChange={(e) => setProfileForm({ ...profileForm, Ime: e.target.value })}
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Prezime"
-                        value={profileForm.Prezime}
-                        onChange={(e) => setProfileForm({ ...profileForm, Prezime: e.target.value })}
-                        required
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email"
-                        value={profileForm.Email}
-                        onChange={(e) => setProfileForm({ ...profileForm, Email: e.target.value })}
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Naziv Agencije"
-                        value={profileForm.NazivAgencije || ""}
-                        onChange={(e) => setProfileForm({ ...profileForm, NazivAgencije: e.target.value })}
-                      />
-                      <input
-                        type="date"
-                        placeholder="Datum rođenja"
-                        value={profileForm.DatumRodjenja ? profileForm.DatumRodjenja.split("T")[0] : ""}
-                        onChange={(e) => setProfileForm({ ...profileForm, DatumRodjenja: e.target.value })}
-                      />
-                      <input
-                        type="password"
-                        placeholder="Stara lozinka (za promenu lozinke)"
-                        value={profileForm.StaraLozinka}
-                        onChange={(e) => setProfileForm({ ...profileForm, StaraLozinka: e.target.value })}
-                      />
-                      <input
-                        type="password"
-                        placeholder="Nova lozinka"
-                        value={profileForm.NovaLozinka}
-                        onChange={(e) => setProfileForm({ ...profileForm, NovaLozinka: e.target.value })}
-                      />
-                      <div className="form-buttons">
-                        <button type="submit" disabled={loading}>
-                          {loading ? "Ažuriranje..." : "Sačuvaj"}
-                        </button>
-                        <button type="button" onClick={() => setEditingProfile(false)}>
-                          Otkaži
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </div>
-              ) : null}
-            </div>
+            <MyProfile
+              token={token}
+              setError={setError}
+              setSuccess={setSuccess}
+              setLoading={setLoading}
+              loading={loading}
+            />
           )}
 
           {/* Svi Korisnici */}
@@ -676,7 +630,6 @@ const AdminHome = () => {
                   {offerRequests.map(offer => (
                     <div key={offer.idPONUDA} className="offer-card">
                       <div className="offer-info">
-                        {/* Dodavanje svih informacija iz baze */}
                         <h4>Ponuda za: {offer.NazivDestinacije || "Nije definirano"}</h4>
                         <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
                         <p><strong>Datum polaska:</strong> {new Date(offer.DatumPolaska).toLocaleDateString()}</p>
@@ -685,7 +638,6 @@ const AdminHome = () => {
                         <p><strong>Broj mjesta:</strong> {offer.BrojSlobodnihMjesta}</p>
                         <p><strong>Najatraktivnija ponuda:</strong> {offer.NajatraktivnijaPonuda ? 'Da' : 'Ne'}</p>
                         <p><strong>Opis:</strong> {offer.Opis}</p>
-                        {/* Ovdje se mogu dodati i informacije o agenciji (iz `/zahtjevi-ponuda/:id` rute) ako su dostupne */}
                         {offer.NazivAgencije && <p><strong>Agencija:</strong> {offer.NazivAgencije}</p>}
                       </div>
                       <div className="offer-actions">
@@ -722,7 +674,6 @@ const AdminHome = () => {
                   {allOffers.map(offer => (
                     <div key={offer.idPONUDA} className="offer-card">
                       <div className="offer-info">
-                        {/* Prikaz svih informacija za aktivne ponude */}
                         <h4>Ponuda za: {offer.Destinacije.map(d => d.Naziv).join(", ")}</h4>
                         <p><strong>Agencija:</strong> {offer.idKORISNIK}</p>
                         <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
@@ -741,10 +692,82 @@ const AdminHome = () => {
               )}
             </div>
           )}
+
+          {/* Destinacije */}
+          {activeSection === "destinations" && (
+            <div className="destinations-section">
+              <h2>Upravljanje Destinacijama</h2>
+
+              <div className="add-destination-form">
+                <h3 style={{ textAlign: 'left' }}>Dodaj novu destinaciju</h3>
+                <form onSubmit={handleAddDestination} className="admin-form">
+                  <input
+                    type="text"
+                    placeholder="Naziv destinacije"
+                    value={destinationForm.Naziv}
+                    onChange={(e) => setDestinationForm({ ...destinationForm, Naziv: e.target.value })}
+                    required
+                  />
+                  <textarea
+                    placeholder="Opis destinacije"
+                    value={destinationForm.Opis}
+                    onChange={(e) => setDestinationForm({ ...destinationForm, Opis: e.target.value })}
+                    required
+                    rows="4"
+                  />
+                  <select
+                    value={destinationForm.Tip}
+                    onChange={(e) => setDestinationForm({ ...destinationForm, Tip: e.target.value })}
+                    required
+                  >
+                    <option value="">Izaberite tip destinacije</option>
+                    <option value="Grad">Grad</option>
+                    <option value="Zemlja">Zemlja</option>
+                    <option value="Regija">Regija</option>
+                    <option value="Kontinent">Kontinent</option>
+                    <option value="Ostrvo">Ostrvo</option>
+                    <option value="Planina">Planina</option>
+                    <option value="More/Okean">More/Okean</option>
+                  </select>
+                  <button type="submit" disabled={loading}>
+                    {loading ? "Dodavanje..." : "Dodaj Destinaciju"}
+                  </button>
+                </form>
+              </div>
+
+              <div className="destinations-list">
+                <h3>Sve destinacije</h3>
+                {loading ? (
+                  <p>Učitavanje...</p>
+                ) : destinations.length > 0 ? (
+                  <div className="destinations-table">
+                    {destinations.map(destination => (
+                      <div key={destination.idDESTINACIJA} className="destination-card">
+                        <div className="destination-info">
+                          <h4>{destination.Naziv}</h4>
+                          <p><strong>Tip:</strong> {destination.Tip}</p>
+                          <p><strong>Opis:</strong> {destination.Opis}</p>
+                        </div>
+                        <div className="destination-actions">
+                          <button
+                            onClick={() => handleDeleteDestination(destination.idDESTINACIJA)}
+                            className="delete-btn"
+                          >
+                            Obriši
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="empty-state">Trenutno nema destinacija u bazi.</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
-
 
   );
 };
