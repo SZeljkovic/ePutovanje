@@ -65,7 +65,7 @@ async function authenticateAdmin(req, res, next) {
             return res.status(403).json({ error: "Pristup dozvoljen samo administratorima." });
         }
 
-        next(); 
+        next();
     } catch (err) {
         console.error("Greška pri provjeri tipa korisnika:", err);
         return res.status(500).json({ error: "Greška na serveru." });
@@ -92,7 +92,7 @@ async function authenticateAgency(req, res, next) {
             return res.status(403).json({ error: "Pristup dozvoljen samo turističkim agencijama." });
         }
 
-        next(); 
+        next();
     } catch (err) {
         console.error("Greška pri provjeri tipa korisnika:", err);
         return res.status(500).json({ error: "Greška na serveru." });
@@ -242,7 +242,7 @@ app.put('/login', async (req, res) => {
 //Pregled profila
 app.get('/profile', authenticateToken, async (req, res) => {
     try {
-        const korisnikId = req.user.idKORISNIK; 
+        const korisnikId = req.user.idKORISNIK;
 
         const query = `
             SELECT 
@@ -623,9 +623,9 @@ app.get('/suspended-accounts', authenticateToken, authenticateAdmin, async (req,
             "SELECT * FROM korisnik WHERE StatusNaloga = -1"
         );
 
-        res.json({ 
+        res.json({
             message: "Suspendovani nalozi uspješno dohvaćeni.",
-            suspendovaniNalozi: rows 
+            suspendovaniNalozi: rows
         });
     } catch (err) {
         console.error("Greška pri dohvatanju suspendovanih naloga:", err);
@@ -753,7 +753,7 @@ app.put('/agency-requests/:id', authenticateToken, authenticateAdmin, async (req
 
         res.json({
             message: "Nalog je uspješno odobren.",
-            approvedAccount: updatedRows[0] 
+            approvedAccount: updatedRows[0]
         });
     } catch (err) {
         console.error("Greška pri odobravanju naloga:", err);
@@ -865,7 +865,7 @@ app.put('/zahtjevi-ponuda/:id/status', authenticateToken, authenticateAdmin, asy
 });
 
 //pregled svih zahtjeva za kreiranje ponuda 
-	app.get('/zahtjevi-ponuda', authenticateToken, authenticateAdmin, async (req, res) => {
+app.get('/zahtjevi-ponuda', authenticateToken, authenticateAdmin, async (req, res) => {
     try {
         const [ponude] = await db.promise().query(
             "SELECT * FROM ponuda WHERE StatusPonude = 0"
@@ -1122,7 +1122,7 @@ app.delete('/destinacija/:id', authenticateToken, authenticateAdmin, async (req,
     try {
 
         const [existing] = await db.promise().query(
-            "SELECT * FROM destinacija WHERE idDESTINACIJA = ?", 
+            "SELECT * FROM destinacija WHERE idDESTINACIJA = ?",
             [id]
         );
 
@@ -1131,7 +1131,7 @@ app.delete('/destinacija/:id', authenticateToken, authenticateAdmin, async (req,
         }
 
         await db.promise().query(
-            "DELETE FROM destinacija WHERE idDESTINACIJA = ?", 
+            "DELETE FROM destinacija WHERE idDESTINACIJA = ?",
             [id]
         );
 
@@ -1227,8 +1227,8 @@ app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req,
         }
 
         // Ažuriranje ponude
-       
-		await db.promise().query(`
+
+        await db.promise().query(`
 			UPDATE ponuda
 			SET 
 				Cijena = ?, 
@@ -1241,15 +1241,15 @@ app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req,
 				StatusPonude = 0          -- reset statusa na "na čekanju odobrenja"
 			WHERE idPONUDA = ?
 		`, [
-			cijena,
-			opis,
-			datumPolaska,
-			datumPovratka,
-			tipPrevoza,
-			brojSlobodnihMjesta,
-			najatraktivnijaPonuda ? 1 : 0,
-			idPONUDA
-		]);
+            cijena,
+            opis,
+            datumPolaska,
+            datumPovratka,
+            tipPrevoza,
+            brojSlobodnihMjesta,
+            najatraktivnijaPonuda ? 1 : 0,
+            idPONUDA
+        ]);
 
 
         if (idDESTINACIJA) {
@@ -1260,7 +1260,7 @@ app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req,
                 WHERE idPONUDA = ?
             `, [idDESTINACIJA, idPONUDA]);
         }
-	//ponuda kad se azurira ponovo postaje zahtjev i treba je administrator odobriti/odbiti
+        //ponuda kad se azurira ponovo postaje zahtjev i treba je administrator odobriti/odbiti
         res.json({ message: "Ponuda uspješno ažurirana." });
     } catch (err) {
         console.error("Greška pri ažuriranju ponude:", err);
@@ -1659,7 +1659,19 @@ app.post('/recenzija', authenticateToken, async (req, res) => {
     }
 });
 
+router.get('/ponuda/:id/ocjena', async (req, res) => {
+    const idPONUDA = parseInt(req.params.id);
 
+    try {
+        const [rows] = await pool.query('CALL GetAverageRating(?, @avgRating); SELECT @avgRating AS averageRating;', [idPONUDA]);
+
+        const averageRating = rows[1][0].averageRating;
+        res.json({ averageRating: averageRating || null });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Greška pri dobijanju ocjene' });
+    }
+});
 
 app.get('/recenzije/:idPONUDA', authenticateToken, async (req, res) => {
     const idPONUDA = req.params.idPONUDA;
@@ -1924,11 +1936,11 @@ app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
 
         const rezervacijeSaStatusom = rezervacije.map(r => ({
             ...r,
-            StatusText: 
+            StatusText:
                 r.StatusRezervacije === 1 ? 'Odobreno' :
-                r.StatusRezervacije === 0 ? 'Na čekanju' :
-                r.StatusRezervacije === -1 ? 'Odbijeno' :
-                r.StatusRezervacije === -2 ? 'Otkazano' : 'Nepoznato',
+                    r.StatusRezervacije === 0 ? 'Na čekanju' :
+                        r.StatusRezervacije === -1 ? 'Odbijeno' :
+                            r.StatusRezervacije === -2 ? 'Otkazano' : 'Nepoznato',
             UkupnaCijena: (r.BrojOdraslih + r.BrojDjece) * r.Cijena
         }));
 
@@ -2012,7 +2024,7 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
 
         // 2. Provjera kapaciteta
         if (ponuda[0].BrojSlobodnihMjesta < (BrojOdraslih + BrojDjece)) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 error: "Nema dovoljno slobodnih mjesta.",
                 slobodnaMjesta: ponuda[0].BrojSlobodnihMjesta
             });
@@ -2113,7 +2125,7 @@ app.put('/moje-rezervacije/:id/otkazi', authenticateToken, async (req, res) => {
             idKorisnik
         ]);
 
-        res.json({ 
+        res.json({
             message: "Rezervacija uspješno otkazana.",
             vraceniKapacitet: rezervacija[0].BrojOdraslih + rezervacija[0].BrojDjece
         });
@@ -2129,4 +2141,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server radi na portu ${PORT}`);
 });
- 

@@ -13,7 +13,7 @@ const Header = ({ setActiveSection, logout, navigate }) => {
       </div>
 
       <div className="header-right">
-        <button onClick={() => setActiveSection("profile")}>Moj Profil</button>
+        {/*<button onClick={() => setActiveSection("profile")}>Moj Profil</button>*/}
         <button
           className="chat-btn"
           onClick={() => navigate("/inbox")}

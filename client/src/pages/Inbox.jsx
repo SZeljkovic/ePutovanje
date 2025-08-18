@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Inbox.css";
 
-const API_BASE = "http://localhost:5000"; // prilagodi port ako je drugi
+const API_BASE = "http://localhost:5000"; 
 
 const Inbox = () => {
   const [chatovi, setChatovi] = useState([]);
