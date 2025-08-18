@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import "./Navbar.css";
 import logo from "../../assets/logo4.png";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaEnvelope } from "react-icons/fa"; // Dodana ikonica poruka
 import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
@@ -31,9 +31,26 @@ const Navbar = () => {
         <li>Kontakt</li>
         <li>
           {loggedIn ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <FaUserCircle size={28} style={{ cursor: "pointer" }} />
-              <button className="btn" onClick={handleLogout}>Odjava</button>
+            <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+              {/* Ikonica za inbox */}
+              <FaEnvelope
+                size={24}
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate("/inbox")}
+                title="Poruke"
+              />
+
+              {/* Ikonica profila */}
+              <FaUserCircle
+                size={28}
+                style={{ cursor: "pointer" }}
+                title="Profil"
+              />
+
+              {/* Dugme odjave */}
+              <button className="btn" onClick={handleLogout}>
+                Odjava
+              </button>
             </div>
           ) : (
             <Link to="/login">

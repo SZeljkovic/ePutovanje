@@ -16,7 +16,7 @@ const Header = ({ setActiveSection, logout, navigate }) => {
         <button onClick={() => setActiveSection("profile")}>Moj Profil</button>
         <button
           className="chat-btn"
-          onClick={() => setActiveSection("chat")}
+          onClick={() => navigate("/inbox")}
           title="Chat poruke"
         >
           <img src={chatIcon} alt="Chat" className="chat-icon" />
