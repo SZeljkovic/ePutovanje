@@ -5,6 +5,7 @@ import "./AdminHome.css";
 import { AuthContext } from "../context/AuthContext";
 import Header from "../components/Header/Header";
 import MyProfile from "../components/MyProfile/MyProfile";
+import AdminNavbar from "../components/AdminNavbar/AdminNavbar";
 
 
 const AdminHome = () => {
@@ -41,7 +42,7 @@ const AdminHome = () => {
     Tip: ""
   });
 
-  
+
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
@@ -362,167 +363,362 @@ const AdminHome = () => {
 
   return (
     <div className="admin-page">
-      <Header
-        setActiveSection={setActiveSection}
-        logout={logout}
-        navigate={navigate}
+      {/*<Header
+      setActiveSection={setActiveSection}
+      logout={logout}
+      navigate={navigate}
+    />*/}
+
+      <AdminNavbar
+        activeSection={activeSection}
+        handleSectionChange={handleSectionChange}
       />
 
-      <div className="admin-container">
-        <div className="admin-sidebar">
-          <h3>Admin Panel</h3>
-          <nav className="admin-nav">
-            <div
-              className={activeSection === "dashboard" ? "menu-item active" : "menu-item"}
-              onClick={() => handleSectionChange("dashboard")}
-            >
-              Dashboard
-            </div>
+      <div className="admin-content">
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
-            <div className="menu-item">
-              Nalozi
-              <div className="submenu">
-                <div onClick={() => handleSectionChange("users")}>Svi korisnici</div>
-                <div onClick={() => handleSectionChange("suspended")}>Suspendovani nalozi</div>
-                <div onClick={() => handleSectionChange("requests")}>Zahtjevi</div>
-                <div onClick={() => handleSectionChange("create-admin")}>Kreiraj Admin</div>
+        {/* Dashboard */}
+        {activeSection === "dashboard" && (
+          <div className="dashboard-section">
+            <h2>Dobrodošli, {user?.KorisnickoIme}!</h2>
+            <div className="dashboard-stats">
+              <div className="stat-card">
+                <h4>Ukupno korisnika</h4>
+                <p>{allUsers.length}</p>
+              </div>
+              <div className="stat-card">
+                <h4>Suspendovani nalozi</h4>
+                <p>{suspendedUsers.length}</p>
+              </div>
+              <div className="stat-card">
+                <h4>Administratori</h4>
+                <p>{allUsers.filter(u => u.TipKorisnika === 0).length}</p>
+              </div>
+              <div className="stat-card">
+                <h4>Agencije</h4>
+                <p>{allUsers.filter(u => u.TipKorisnika === 1).length}</p>
               </div>
             </div>
-
-            <div className="menu-item">
-              Ponude
-              <div className="submenu">
-                <div onClick={() => handleSectionChange("offers")}>Sve ponude</div>
-                <div onClick={() => handleSectionChange("offer-requests")}>Zahtjevi</div>
-              </div>
+          </div>
+        )}
+        {/* Svi Korisnici */}
+        {activeSection === "users" && (
+          <div className="users-section">
+            <h2>Upravljanje Korisnicima</h2>
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Pretraži korisnike..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-
-            <div className="menu-item" onClick={() => handleSectionChange("destinations")}>
-              Destinacije
-            </div>
-          </nav>
-        </div>
-
-
-
-        <div className="admin-content">
-          {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">{success}</div>}
-
-          {/* Dashboard */}
-          {activeSection === "dashboard" && (
-            <div className="dashboard-section">
-              <h2>Dobrodošli, {user?.KorisnickoIme}!</h2>
-              <div className="dashboard-stats">
-                <div className="stat-card">
-                  <h4>Ukupno korisnika</h4>
-                  <p>{allUsers.length}</p>
-                </div>
-                <div className="stat-card">
-                  <h4>Suspendovani nalozi</h4>
-                  <p>{suspendedUsers.length}</p>
-                </div>
-                <div className="stat-card">
-                  <h4>Administratori</h4>
-                  <p>{allUsers.filter(u => u.TipKorisnika === 0).length}</p>
-                </div>
-                <div className="stat-card">
-                  <h4>Agencije</h4>
-                  <p>{allUsers.filter(u => u.TipKorisnika === 1).length}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Moj Profil */}
-          {activeSection === "profile" && (
-            <MyProfile
-              token={token}
-              setError={setError}
-              setSuccess={setSuccess}
-              setLoading={setLoading}
-              loading={loading}
-            />
-          )}
-
-          {/* Svi Korisnici */}
-          {activeSection === "users" && (
-            <div className="users-section">
-              <h2>Upravljanje Korisnicima</h2>
-              <div className="search-bar">
-                <input
-                  type="text"
-                  placeholder="Pretraži korisnike..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              {loading ? (
-                <p>Učitavanje...</p>
-              ) : (
-                <div className="users-table">
-                  {filteredUsers.map(user => (
-                    <div key={user.idKORISNIK} className="user-card">
-                      <div className="user-info">
-                        {user.NazivAgencije ? (
-                          <h4>{user.NazivAgencije}</h4>
-                        ) : (
-                          <h4>{user.Ime} {user.Prezime}</h4>
-                        )}
-                        <p><strong>Korisničko ime:</strong> {user.KorisnickoIme}</p>
-                        <p><strong>Email:</strong> {user.Email}</p>
-                        <p><strong>Tip:</strong> {getTipKorisnikaText(user.TipKorisnika)}</p>
-                        <p><strong>Status:</strong> {getStatusText(user.StatusNaloga)}</p>
-                      </div>
-                      <div className="user-actions">
-                        {user.idKORISNIK !== profile?.idKORISNIK && (
-                          <button
-                            onClick={() => handleSuspendAccount(user.idKORISNIK)}
-                            className="suspend-btn">
-                            Suspenduj
-                          </button>
-                        )}
-                        {user.idKORISNIK !== profile?.idKORISNIK && (
-                          <button
-                            onClick={() => handleDeleteAccount(user.idKORISNIK)}
-                            className="delete-btn">
-                            Obriši
-                          </button>
-                        )}
+            {loading ? (
+              <p>Učitavanje...</p>
+            ) : (
+              <div className="users-table">
+                {filteredUsers.map(user => (
+                  <div key={user.idKORISNIK} className="user-card">
+                    <div className="user-info">
+                      {user.NazivAgencije ? (
+                        <h4>{user.NazivAgencije}</h4>
+                      ) : (
+                        <h4>{user.Ime} {user.Prezime}</h4>
+                      )}
+                      <div className="user-details-row">
+                        <div className="user-detail-item">
+                          <strong>Korisničko ime: </strong> {user.KorisnickoIme}
+                        </div>
+                        <div className="user-detail-item">
+                          <strong>Email: </strong> {user.Email}
+                        </div>
+                        <div className="user-detail-item">
+                          <strong>Tip: </strong> {getTipKorisnikaText(user.TipKorisnika)}
+                        </div>
+                        <div className="user-detail-item">
+                          <strong>Status: </strong> {getStatusText(user.StatusNaloga)}
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Suspendovani Nalozi */}
-          {activeSection === "suspended" && (
-            <div className="suspended-section">
-              <h2>Suspendovani Nalozi</h2>
-              {loading ? (
-                <p>Učitavanje...</p>
-              ) : (
-                <div className="users-table">
-                  {suspendedUsers.map(user => (
-                    <div key={user.idKORISNIK} className="user-card">
-                      <div className="user-info">
-                        <h4>{user.Ime} {user.Prezime}</h4>
-                        <p><strong>Korisničko ime:</strong> {user.KorisnickoIme}</p>
-                        <p><strong>Email:</strong> {user.Email}</p>
-                        <p><strong>Tip:</strong> {getTipKorisnikaText(user.TipKorisnika)}</p>
-                        {user.NazivAgencije && <p><strong>Agencija:</strong> {user.NazivAgencije}</p>}
-                      </div>
-                      <div className="user-actions">
+                    <div className="user-actions">
+                      {user.idKORISNIK !== profile?.idKORISNIK && (
                         <button
-                          onClick={() => handleReactivateAccount(user.idKORISNIK)}
-                          className="reactivate-btn"
-                        >
-                          Reaktiviraj
+                          onClick={() => handleSuspendAccount(user.idKORISNIK)}
+                          className="suspend-btn">
+                          Suspenduj
                         </button>
+                      )}
+                      {user.idKORISNIK !== profile?.idKORISNIK && (
                         <button
                           onClick={() => handleDeleteAccount(user.idKORISNIK)}
+                          className="delete-btn">
+                          Obriši
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+
+        {/* Suspendovani Nalozi */}
+        {activeSection === "suspended" && (
+          <div className="suspended-section">
+            <h2>Suspendovani Nalozi</h2>
+            {loading ? (
+              <p>Učitavanje...</p>
+            ) : (
+              <div className="users-table">
+                {suspendedUsers.map(user => (
+                  <div key={user.idKORISNIK} className="user-card">
+                    <div className="user-info">
+                      <h4>{user.Ime} {user.Prezime}</h4>
+                      <p><strong>Korisničko ime:</strong> {user.KorisnickoIme}</p>
+                      <p><strong>Email:</strong> {user.Email}</p>
+                      <p><strong>Tip:</strong> {getTipKorisnikaText(user.TipKorisnika)}</p>
+                      {user.NazivAgencije && <p><strong>Agencija:</strong> {user.NazivAgencije}</p>}
+                    </div>
+                    <div className="user-actions">
+                      <button
+                        onClick={() => handleReactivateAccount(user.idKORISNIK)}
+                        className="reactivate-btn"
+                      >
+                        Reaktiviraj
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAccount(user.idKORISNIK)}
+                        className="delete-btn"
+                      >
+                        Obriši
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Zahtjevi agencija */}
+        {activeSection === "requests" && (
+          <div className="requests-section">
+            <h2>Zahtjevi za registraciju agencija</h2>
+            {loading ? (
+              <p>Učitavanje...</p>
+            ) : agencyRequests.length > 0 ? (
+              <div className="users-table">
+                {agencyRequests.map(request => (
+                  <div key={request.idKORISNIK} className="user-card">
+                    <div className="user-info">
+                      <h4>{request.NazivAgencije}</h4>
+                      <p><strong>Korisničko ime:</strong> {request.KorisnickoIme}</p>
+                      <p><strong>Email:</strong> {request.Email}</p>
+                    </div>
+                    <div className="user-actions">
+                      <button
+                        onClick={() => handleApproveAgency(request.idKORISNIK)}
+                        className="approve-btn">
+                        Odobri
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAccount(request.idKORISNIK)}
+                        className="delete-btn">
+                        Odbij
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>Nema novih zahtjeva za odobravanje.</p>
+            )}
+          </div>
+        )}
+
+
+        {/* Kreiraj Admin */}
+        {activeSection === "create-admin" && (
+          <div className="create-admin-section">
+            <h2>Kreiraj Administratorski Nalog</h2>
+            <form onSubmit={handleCreateAdmin} className="admin-form">
+              <input
+                type="text"
+                placeholder="Ime"
+                value={adminForm.Ime}
+                onChange={(e) => setAdminForm({ ...adminForm, Ime: e.target.value })}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Prezime"
+                value={adminForm.Prezime}
+                onChange={(e) => setAdminForm({ ...adminForm, Prezime: e.target.value })}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Korisničko ime"
+                value={adminForm.KorisnickoIme}
+                onChange={(e) => setAdminForm({ ...adminForm, KorisnickoIme: e.target.value })}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Lozinka"
+                value={adminForm.Lozinka}
+                onChange={(e) => setAdminForm({ ...adminForm, Lozinka: e.target.value })}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={adminForm.Email}
+                onChange={(e) => setAdminForm({ ...adminForm, Email: e.target.value })}
+                required
+              />
+              <button type="submit" disabled={loading}>
+                {loading ? "Kreiranje..." : "Kreiraj Admin Nalog"}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Sve Ponude (aktivne) */}
+        {activeSection === "offers" && (
+          <div className="offers-section">
+            <h2>Sve aktivne ponude</h2>
+            {loading ? (
+              <p>Učitavanje...</p>
+            ) : allOffers.length > 0 ? (
+              <div className="offers-list">
+                {allOffers.map(offer => (
+                  <div key={offer.idPONUDA} className="offer-card">
+                    <div className="offer-info">
+                      <h4>Ponuda za: {offer.Destinacije.map(d => d.Naziv).join(", ")}</h4>
+                      <p><strong>Agencija:</strong> {offer.idKORISNIK}</p>
+                      <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
+                      <p><strong>Datum polaska:</strong> {new Date(offer.DatumPolaska).toLocaleDateString()}</p>
+                      <p><strong>Datum povratka:</strong> {new Date(offer.DatumPovratka).toLocaleDateString()}</p>
+                      <p><strong>Tip prevoza:</strong> {offer.TipPrevoza}</p>
+                      <p><strong>Broj mjesta:</strong> {offer.BrojSlobodnihMjesta}</p>
+                      <p><strong>Najatraktivnija ponuda:</strong> {offer.NajatraktivnijaPonuda ? 'Da' : 'Ne'}</p>
+                      <p><strong>Opis:</strong> {offer.Opis}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Trenutno nema aktivnih ponuda.</p>
+            )}
+          </div>
+        )}
+
+        {/* Zahtjevi za Ponude */}
+        {activeSection === "offer-requests" && (
+          <div className="requests-section">
+            <h2>Zahtjevi za ponude</h2>
+            {loading ? (
+              <p>Učitavanje...</p>
+            ) : offerRequests.length > 0 ? (
+              <div className="requests-list">
+                {offerRequests.map(offer => (
+                  <div key={offer.idPONUDA} className="offer-card">
+                    <div className="offer-info">
+                      <h4>Ponuda za: {offer.NazivDestinacije || "Nije definirano"}</h4>
+                      <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
+                      <p><strong>Datum polaska:</strong> {new Date(offer.DatumPolaska).toLocaleDateString()}</p>
+                      <p><strong>Datum povratka:</strong> {new Date(offer.DatumPovratka).toLocaleDateString()}</p>
+                      <p><strong>Tip prevoza:</strong> {offer.TipPrevoza}</p>
+                      <p><strong>Broj mjesta:</strong> {offer.BrojSlobodnihMjesta}</p>
+                      <p><strong>Najatraktivnija ponuda:</strong> {offer.NajatraktivnijaPonuda ? 'Da' : 'Ne'}</p>
+                      <p><strong>Opis:</strong> {offer.Opis}</p>
+                      {offer.NazivAgencije && <p><strong>Agencija:</strong> {offer.NazivAgencije}</p>}
+                    </div>
+                    <div className="offer-actions">
+                      <button
+                        className="approve-btn"
+                        onClick={() => handleOfferStatusUpdate(offer.idPONUDA, 1)}
+                      >
+                        Odobri
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleOfferStatusUpdate(offer.idPONUDA, -1)}
+                      >
+                        Odbij
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Nema novih zahtjeva za ponude.</p>
+            )}
+          </div>
+        )}
+
+        {/* Destinacije */}
+        {activeSection === "destinations" && (
+          <div className="destinations-section">
+            <h2>Upravljanje Destinacijama</h2>
+
+            <div className="add-destination-form">
+              <h3 style={{ textAlign: 'left' }}>Dodaj novu destinaciju</h3>
+              <form onSubmit={handleAddDestination} className="admin-form">
+                <input
+                  type="text"
+                  placeholder="Naziv destinacije"
+                  value={destinationForm.Naziv}
+                  onChange={(e) => setDestinationForm({ ...destinationForm, Naziv: e.target.value })}
+                  required
+                />
+                <textarea
+                  placeholder="Opis destinacije"
+                  value={destinationForm.Opis}
+                  onChange={(e) => setDestinationForm({ ...destinationForm, Opis: e.target.value })}
+                  required
+                  rows="4"
+                />
+                <select
+                  value={destinationForm.Tip}
+                  onChange={(e) => setDestinationForm({ ...destinationForm, Tip: e.target.value })}
+                  required
+                >
+                  <option value="">Izaberite tip destinacije</option>
+                  <option value="Grad">Grad</option>
+                  <option value="Zemlja">Zemlja</option>
+                  <option value="Regija">Regija</option>
+                  <option value="Kontinent">Kontinent</option>
+                  <option value="Ostrvo">Ostrvo</option>
+                  <option value="Planina">Planina</option>
+                  <option value="More/Okean">More/Okean</option>
+                </select>
+                <button type="submit" disabled={loading}>
+                  {loading ? "Dodavanje..." : "Dodaj Destinaciju"}
+                </button>
+              </form>
+            </div>
+
+            <div className="destinations-list">
+              <h3>Sve destinacije</h3>
+              {loading ? (
+                <p>Učitavanje...</p>
+              ) : destinations.length > 0 ? (
+                <div className="destinations-table">
+                  {destinations.map(destination => (
+                    <div key={destination.idDESTINACIJA} className="destination-card">
+                      <div className="destination-info">
+                        <h4>{destination.Naziv}</h4>
+                        <p><strong>Tip:</strong> {destination.Tip}</p>
+                        <p><strong>Opis:</strong> {destination.Opis}</p>
+                      </div>
+                      <div className="destination-actions">
+                        <button
+                          onClick={() => handleDeleteDestination(destination.idDESTINACIJA)}
                           className="delete-btn"
                         >
                           Obriši
@@ -531,241 +727,12 @@ const AdminHome = () => {
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* Zahtjevi agencija */}
-          {activeSection === "requests" && (
-            <div className="requests-section">
-              <h2>Zahtjevi za registraciju agencija</h2>
-              {loading ? (
-                <p>Učitavanje...</p>
-              ) : agencyRequests.length > 0 ? (
-                <div className="users-table">
-                  {agencyRequests.map(request => (
-                    <div key={request.idKORISNIK} className="user-card">
-                      <div className="user-info">
-                        <h4>{request.NazivAgencije}</h4>
-                        <p><strong>Korisničko ime:</strong> {request.KorisnickoIme}</p>
-                        <p><strong>Email:</strong> {request.Email}</p>
-                      </div>
-                      <div className="user-actions">
-                        <button
-                          onClick={() => handleApproveAgency(request.idKORISNIK)}
-                          className="approve-btn">
-                          Odobri
-                        </button>
-                        <button
-                          onClick={() => handleDeleteAccount(request.idKORISNIK)}
-                          className="delete-btn">
-                          Odbij
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               ) : (
-                <p>Nema novih zahtjeva za odobravanje.</p>
+                <p className="empty-state">Trenutno nema destinacija u bazi.</p>
               )}
             </div>
-          )}
-
-
-          {/* Kreiraj Admin */}
-          {activeSection === "create-admin" && (
-            <div className="create-admin-section">
-              <h2>Kreiraj Administratorski Nalog</h2>
-              <form onSubmit={handleCreateAdmin} className="admin-form">
-                <input
-                  type="text"
-                  placeholder="Ime"
-                  value={adminForm.Ime}
-                  onChange={(e) => setAdminForm({ ...adminForm, Ime: e.target.value })}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Prezime"
-                  value={adminForm.Prezime}
-                  onChange={(e) => setAdminForm({ ...adminForm, Prezime: e.target.value })}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Korisničko ime"
-                  value={adminForm.KorisnickoIme}
-                  onChange={(e) => setAdminForm({ ...adminForm, KorisnickoIme: e.target.value })}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Lozinka"
-                  value={adminForm.Lozinka}
-                  onChange={(e) => setAdminForm({ ...adminForm, Lozinka: e.target.value })}
-                  required
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={adminForm.Email}
-                  onChange={(e) => setAdminForm({ ...adminForm, Email: e.target.value })}
-                  required
-                />
-                <button type="submit" disabled={loading}>
-                  {loading ? "Kreiranje..." : "Kreiraj Admin Nalog"}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Zahtjevi za Ponude */}
-          {activeSection === "offer-requests" && (
-            <div className="requests-section">
-              <h2>Zahtjevi za ponude</h2>
-              {loading ? (
-                <p>Učitavanje...</p>
-              ) : offerRequests.length > 0 ? (
-                <div className="requests-list">
-                  {offerRequests.map(offer => (
-                    <div key={offer.idPONUDA} className="offer-card">
-                      <div className="offer-info">
-                        <h4>Ponuda za: {offer.NazivDestinacije || "Nije definirano"}</h4>
-                        <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
-                        <p><strong>Datum polaska:</strong> {new Date(offer.DatumPolaska).toLocaleDateString()}</p>
-                        <p><strong>Datum povratka:</strong> {new Date(offer.DatumPovratka).toLocaleDateString()}</p>
-                        <p><strong>Tip prevoza:</strong> {offer.TipPrevoza}</p>
-                        <p><strong>Broj mjesta:</strong> {offer.BrojSlobodnihMjesta}</p>
-                        <p><strong>Najatraktivnija ponuda:</strong> {offer.NajatraktivnijaPonuda ? 'Da' : 'Ne'}</p>
-                        <p><strong>Opis:</strong> {offer.Opis}</p>
-                        {offer.NazivAgencije && <p><strong>Agencija:</strong> {offer.NazivAgencije}</p>}
-                      </div>
-                      <div className="offer-actions">
-                        <button
-                          className="approve-btn"
-                          onClick={() => handleOfferStatusUpdate(offer.idPONUDA, 1)}
-                        >
-                          Odobri
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleOfferStatusUpdate(offer.idPONUDA, -1)}
-                        >
-                          Odbij
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="empty-state">Nema novih zahtjeva za ponude.</p>
-              )}
-            </div>
-          )}
-
-          {/* Sve Ponude (aktivne) */}
-          {activeSection === "offers" && (
-            <div className="offers-section">
-              <h2>Sve aktivne ponude</h2>
-              {loading ? (
-                <p>Učitavanje...</p>
-              ) : allOffers.length > 0 ? (
-                <div className="offers-list">
-                  {allOffers.map(offer => (
-                    <div key={offer.idPONUDA} className="offer-card">
-                      <div className="offer-info">
-                        <h4>Ponuda za: {offer.Destinacije.map(d => d.Naziv).join(", ")}</h4>
-                        <p><strong>Agencija:</strong> {offer.idKORISNIK}</p>
-                        <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
-                        <p><strong>Datum polaska:</strong> {new Date(offer.DatumPolaska).toLocaleDateString()}</p>
-                        <p><strong>Datum povratka:</strong> {new Date(offer.DatumPovratka).toLocaleDateString()}</p>
-                        <p><strong>Tip prevoza:</strong> {offer.TipPrevoza}</p>
-                        <p><strong>Broj mjesta:</strong> {offer.BrojSlobodnihMjesta}</p>
-                        <p><strong>Najatraktivnija ponuda:</strong> {offer.NajatraktivnijaPonuda ? 'Da' : 'Ne'}</p>
-                        <p><strong>Opis:</strong> {offer.Opis}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="empty-state">Trenutno nema aktivnih ponuda.</p>
-              )}
-            </div>
-          )}
-
-          {/* Destinacije */}
-          {activeSection === "destinations" && (
-            <div className="destinations-section">
-              <h2>Upravljanje Destinacijama</h2>
-
-              <div className="add-destination-form">
-                <h3 style={{ textAlign: 'left' }}>Dodaj novu destinaciju</h3>
-                <form onSubmit={handleAddDestination} className="admin-form">
-                  <input
-                    type="text"
-                    placeholder="Naziv destinacije"
-                    value={destinationForm.Naziv}
-                    onChange={(e) => setDestinationForm({ ...destinationForm, Naziv: e.target.value })}
-                    required
-                  />
-                  <textarea
-                    placeholder="Opis destinacije"
-                    value={destinationForm.Opis}
-                    onChange={(e) => setDestinationForm({ ...destinationForm, Opis: e.target.value })}
-                    required
-                    rows="4"
-                  />
-                  <select
-                    value={destinationForm.Tip}
-                    onChange={(e) => setDestinationForm({ ...destinationForm, Tip: e.target.value })}
-                    required
-                  >
-                    <option value="">Izaberite tip destinacije</option>
-                    <option value="Grad">Grad</option>
-                    <option value="Zemlja">Zemlja</option>
-                    <option value="Regija">Regija</option>
-                    <option value="Kontinent">Kontinent</option>
-                    <option value="Ostrvo">Ostrvo</option>
-                    <option value="Planina">Planina</option>
-                    <option value="More/Okean">More/Okean</option>
-                  </select>
-                  <button type="submit" disabled={loading}>
-                    {loading ? "Dodavanje..." : "Dodaj Destinaciju"}
-                  </button>
-                </form>
-              </div>
-
-              <div className="destinations-list">
-                <h3>Sve destinacije</h3>
-                {loading ? (
-                  <p>Učitavanje...</p>
-                ) : destinations.length > 0 ? (
-                  <div className="destinations-table">
-                    {destinations.map(destination => (
-                      <div key={destination.idDESTINACIJA} className="destination-card">
-                        <div className="destination-info">
-                          <h4>{destination.Naziv}</h4>
-                          <p><strong>Tip:</strong> {destination.Tip}</p>
-                          <p><strong>Opis:</strong> {destination.Opis}</p>
-                        </div>
-                        <div className="destination-actions">
-                          <button
-                            onClick={() => handleDeleteDestination(destination.idDESTINACIJA)}
-                            className="delete-btn"
-                          >
-                            Obriši
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="empty-state">Trenutno nema destinacija u bazi.</p>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
 
