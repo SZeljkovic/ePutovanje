@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import "./Navbar.css";
 import logo from "../../assets/logo4.png";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaEnvelope } from "react-icons/fa"; // Dodana ikonica poruka
+import { FaUserCircle, FaEnvelope } from "react-icons/fa"; 
 import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
