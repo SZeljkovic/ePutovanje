@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Nav, Collapse } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const AdminNavbar = ({ activeSection, handleSectionChange }) => {
   const [openNalozi, setOpenNalozi] = useState(false);
   const [openPonude, setOpenPonude] = useState(false);
+  const navigate = useNavigate();
+
 
   return (
     <div className="admin-sidebar vh-100 d-flex flex-column p-0" 
@@ -225,34 +228,63 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
             <i className="fas fa-map-marker-alt me-2"></i>
             Destinacije
           </Nav.Link>
-        </div>
+             </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
+           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
           <Nav.Link
-            onClick={() => handleSectionChange("problems")}
-            className={`text-white fw-bold px-3 py-2 ${activeSection === 'problems' ? 'active' : ''}`}
-            style={{
-              background: activeSection === 'problems' 
-                ? 'rgba(255,255,255,0.1)' 
-                : 'transparent',
-              transition: 'all 0.2s ease',
-              borderLeft: activeSection === 'problems' ? '3px solid #fff' : '3px solid transparent',
-              borderRadius: '0'
+           onClick={() => navigate("/reportproblem")}
+          className={`text-white fw-bold px-3 py-2 ${activeSection === 'problems' ? 'active' : ''}`}
+           style={{
+          background: activeSection === 'problems' 
+             ? 'rgba(255,255,255,0.1)' 
+             : 'transparent',
+            transition: 'all 0.2s ease',
+            borderLeft: activeSection === 'problems' ? '3px solid #fff' : '3px solid transparent',
+             borderRadius: '0'
             }}
             onMouseEnter={(e) => {
-              if (activeSection !== 'problems') {
-                e.target.style.background = 'rgba(255,255,255,0.05)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeSection !== 'problems') {
-                e.target.style.background = 'transparent';
-              }
-            }}
+          if (activeSection !== 'problems') {
+             e.target.style.background = 'rgba(255,255,255,0.05)';
+           }
+          }}
+          onMouseLeave={(e) => {
+          if (activeSection !== 'problems') {
+           e.target.style.background = 'transparent';
+           }
+             }}
           >
-            <i className="fas fa-map-marker-alt me-2"></i>
-            Problemi
-          </Nav.Link>
+        <i className="fas fa-exclamation-triangle me-2"></i>
+          Prijavi problem
+         </Nav.Link>
+
+
+         <Nav.Link
+  onClick={() => handleSectionChange("problems")}
+  className={`text-white fw-bold px-3 py-2 ${activeSection === 'problems' ? 'active' : ''}`}
+  style={{
+    background: activeSection === 'problems' 
+      ? 'rgba(255,255,255,0.1)' 
+      : 'transparent',
+    transition: 'all 0.2s ease',
+    borderLeft: activeSection === 'problems' ? '3px solid #fff' : '3px solid transparent',
+    borderRadius: '0'
+  }}
+  onMouseEnter={(e) => {
+    if (activeSection !== 'problems') {
+      e.target.style.background = 'rgba(255,255,255,0.05)';
+    }
+  }}
+  onMouseLeave={(e) => {
+    if (activeSection !== 'problems') {
+      e.target.style.background = 'transparent';
+    }
+  }}
+>
+  <i className="fas fa-list me-2"></i>
+  Lista problema
+</Nav.Link>
+
+
         </div>
 
       </Nav>

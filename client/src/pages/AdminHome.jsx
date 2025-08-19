@@ -35,6 +35,9 @@ const AdminHome = () => {
   const [allOffers, setAllOffers] = useState([]);
   const [offerDetails, setOfferDetails] = useState(null);
 
+  const [problems, setProblems] = useState([]);
+
+
   const [adminForm, setAdminForm] = useState({
     Ime: "",
     Prezime: "",
@@ -160,6 +163,21 @@ const AdminHome = () => {
       setLoading(false);
     }
   };
+
+  const loadProblems = async () => {
+  try {
+    setLoading(true);
+    const res = await axios.get("http://localhost:5000/problemi", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setProblems(res.data);
+  } catch (err) {
+    setError("Greška pri učitavanju problema");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleApproveAgency = async (id) => {
     try {
@@ -394,6 +412,10 @@ const AdminHome = () => {
     } else if (activeSection === "profile") { 
       loadProfile();
     }
+    else if (activeSection === "problems") {
+      loadProblems();
+    }
+
   }, [activeSection, token]);
 
   const getTipKorisnikaText = (tip) => {
@@ -872,6 +894,30 @@ const AdminHome = () => {
             </div>
           </div>
         )}
+
+        {/* Lista problema */}
+{activeSection === "problems" && (
+  <div className="problems-section">
+    <h2>Prijavljeni problemi korisnika</h2>
+    {loading ? (
+      <p>Učitavanje...</p>
+    ) : problems.length > 0 ? (
+      <div className="problems-list">
+        {problems.map(problem => (
+          <div key={problem.idPROBLEM} className="problem-card">
+            <h4>{problem.Naslov}</h4>
+            <p><strong>Korisnik:</strong> {problem.KorisnickoIme} (ID: {problem.idKORISNIK})</p>
+            <p>{problem.Sadržaj}</p>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p className="empty-state">Trenutno nema prijavljenih problema.</p>
+    )}
+  </div>
+)}
+
+
       </div>
     </div>
 
