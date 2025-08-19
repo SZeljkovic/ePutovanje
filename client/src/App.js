@@ -8,6 +8,8 @@ import AgencyHome from './pages/AgencyHome';
 import Register from './pages/Register';
 import Inbox from './pages/Inbox';
 import Header from './components/Header/Header';
+import ReportProblem from './pages/ReportProblem';
+import ForgotPassword from './pages/ForgotPassword';
 
 const App = () => {
   const location = useLocation();
@@ -38,6 +40,8 @@ const App = () => {
         <Route path="/admin" element={<AdminHome />} />
         <Route path="/agency" element={<AgencyHome />} />
         <Route path="/inbox" element={<Inbox />} />
+        <Route path="/reportproblem" element={<ReportProblem />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
       </Routes>
       <Footer />
     </>

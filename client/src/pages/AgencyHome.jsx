@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header/Header";
 import axios from "axios";
 import "./AgencyHome.css";
@@ -17,7 +18,14 @@ const AgencyHome = () => {
   const [odabranaPonuda, setOdabranaPonuda] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [ponudaForm, setPonudaForm] = useState({});
+  const [odabranaRezervacija, setOdabranaRezervacija] = useState(null);
+  const [profilKorisnika, setProfilKorisnika] = useState(null);
+  const [odbijeneRezervacije, setOdbijeneRezervacije] = useState([]);
+  const [profilForm, setProfilForm] = useState({});
 
+
+
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
@@ -144,6 +152,42 @@ const fetchPonudaDetalji = async (id) => {
   }
 };
 
+const fetchRezervacijaDetalji = async (id) => {
+  try {
+    const res = await axios.get(`${API_BASE}/sve-rezervacije/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setOdabranaRezervacija(res.data);
+  } catch (err) {
+    console.error("Greška detalji rezervacije:", err);
+    alert("Greška pri dohvatanju detalja rezervacije.");
+  }
+};
+
+const fetchProfilKorisnika = async (id) => {
+  try {
+    const res = await axios.get(`${API_BASE}/profile/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setProfilKorisnika(res.data.user);
+  } catch (err) {
+    console.error("Greška profil korisnika:", err);
+    alert("Greška pri dohvatanju profila korisnika.");
+  }
+};
+
+const fetchOdbijeneRezervacije = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/odbijene-rezervacije`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setOdbijeneRezervacije(res.data);
+  } catch (err) {
+    console.error("Greška odbijene rezervacije:", err);
+  }
+};
+
+
 const handlePonudaChange = (e) => {
   const { name, value } = e.target;
   setPonudaForm({ ...ponudaForm, [name]: value });
@@ -154,6 +198,29 @@ const formatDateForMySQL = (dateStr) => {
   const d = new Date(dateStr);
   const pad = (n) => (n < 10 ? "0" + n : n);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
+
+
+const handleProfilChange = (e) => {
+  const { name, value } = e.target;
+  setProfilForm({ ...profilForm, [name]: value });
+};
+
+const handleUpdateProfil = async () => {
+  try {
+    const res = await axios.put(
+      `${API_BASE}/edit-profile`,
+      profilForm,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert(res.data.message);
+    setEditMode(false);
+    fetchProfil(); // refresh nakon izmjene
+  } catch (err) {
+    console.error("Greška izmjena profila:", err);
+    alert(err.response?.data?.error || "Greška pri izmjeni profila.");
+  }
 };
 
 
@@ -312,23 +379,70 @@ const handleDeletePonuda = async () => {
         );
 
       case "reservations":
-        return (
-          <div>
-            <h2>📑 Lista prihvaćenih rezervacija</h2>
-            {rezervacije.length === 0 ? (
-              <p>Nema prihvaćenih rezervacija.</p>
-            ) : (
-              <ul>
-                {rezervacije.map((r) => (
-                  <li key={r.idREZERVACIJA}>
-                    {r.ImeKorisnika} {r.PrezimeKorisnika} - {r.NazivPonude} (
-                    {r.Datum})
-                  </li>
-                ))}
-              </ul>
-            )}
+  return (
+    <div>
+      <h2>📑 Lista prihvaćenih rezervacija</h2>
+
+      {odabranaRezervacija ? (
+        profilKorisnika ? (
+          <div className="zahtjev-detalji">
+            <h3>👤 Profil korisnika</h3>
+            <ul>
+              <li><b>Ime:</b> {profilKorisnika.Ime}</li>
+              <li><b>Prezime:</b> {profilKorisnika.Prezime}</li>
+              <li><b>Email:</b> {profilKorisnika.Email}</li>
+              <li><b>Korisničko ime:</b> {profilKorisnika.KorisnickoIme}</li>
+              <li><b>Datum rođenja:</b> {profilKorisnika.DatumRodjenja}</li>
+            </ul>
+            <div className="zahtjev-akcije">
+              <button className="btn-back" onClick={() => setProfilKorisnika(null)}>⬅ Nazad</button>
+            </div>
           </div>
-        );
+        ) : (
+          <div className="zahtjev-detalji">
+            <h3>📌 Detalji rezervacije</h3>
+            <ul>
+              <li><b>Rezervacija ID:</b> {odabranaRezervacija.idREZERVACIJA}</li>
+              <li><b>Datum:</b> {new Date(odabranaRezervacija.Datum).toLocaleDateString()}</li>
+              <li><b>Odraslih:</b> {odabranaRezervacija.BrojOdraslih}</li>
+              <li><b>Djece:</b> {odabranaRezervacija.BrojDjece}</li>
+              <li><b>Status:</b> {odabranaRezervacija.StatusRezervacije}</li>
+              <li><b>Ponuda:</b> {odabranaRezervacija.NazivPonude}</li>
+              <li><b>Cijena po osobi:</b> {odabranaRezervacija.CijenaPoOsobi} €</li>
+              <li><b>Korisnik:</b> {odabranaRezervacija.ImeKorisnika} {odabranaRezervacija.PrezimeKorisnika}</li>
+            </ul>
+
+            <div className="zahtjev-akcije">
+              <button
+                className="btn-accept"
+                onClick={() => fetchProfilKorisnika(odabranaRezervacija.idKORISNIK)}
+              >
+                👤 Profil korisnika
+              </button>
+              <button className="btn-back" onClick={() => setOdabranaRezervacija(null)}>⬅ Nazad</button>
+            </div>
+          </div>
+        )
+      ) : (
+        <ul className="zahtjevi-lista">
+          {rezervacije.length === 0 ? (
+            <p>Nema prihvaćenih rezervacija.</p>
+          ) : (
+            rezervacije.map((r) => (
+              <li
+                key={r.idREZERVACIJA}
+                onClick={() => fetchRezervacijaDetalji(r.idREZERVACIJA)}
+                className="zahtjev-item"
+              >
+                {r.ImeKorisnika} {r.PrezimeKorisnika} - {r.NazivPonude} ({new Date(r.Datum).toLocaleDateString()})
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
+  );
+
 
       case "archive":
   return (
@@ -437,22 +551,93 @@ const handleDeletePonuda = async () => {
 
 
       case "profile":
-        return (
-          <div>
-            <h2>👤 Moj profil</h2>
-            {profil ? (
-              <ul>
-                <li>Ime: {profil.Ime}</li>
-                <li>Prezime: {profil.Prezime}</li>
-                <li>Naziv agencije: {profil.NazivAgencije}</li>
-                <li>Email: {profil.Email}</li>
-                <li>Korisničko ime: {profil.KorisnickoIme}</li>
-              </ul>
-            ) : (
-              <p>Greška pri učitavanju profila.</p>
-            )}
+  return (
+    <div>
+      <h2>👤 Moj profil</h2>
+      {profil ? (
+        editMode ? (
+          <div className="profil-edit-form">
+            <h3>Izmjena profila</h3>
+            <input
+              type="text"
+              name="Ime"
+              value={profilForm.Ime || ""}
+              onChange={handleProfilChange}
+              placeholder="Ime"
+            />
+            <input
+              type="text"
+              name="Prezime"
+              value={profilForm.Prezime || ""}
+              onChange={handleProfilChange}
+              placeholder="Prezime"
+            />
+            <input
+              type="text"
+              name="NazivAgencije"
+              value={profilForm.NazivAgencije || ""}
+              onChange={handleProfilChange}
+              placeholder="Naziv agencije"
+            />
+            <input
+              type="email"
+              name="Email"
+              value={profilForm.Email || ""}
+              onChange={handleProfilChange}
+              placeholder="Email"
+            />
+            <input
+              type="date"
+              name="DatumRodjenja"
+              value={profilForm.DatumRodjenja?.split("T")[0] || ""}
+              onChange={handleProfilChange}
+            />
+
+            <h4 style={{ marginTop: "15px" }}>Promjena lozinke</h4>
+            <input
+              type="password"
+              name="StaraLozinka"
+              value={profilForm.StaraLozinka || ""}
+              onChange={handleProfilChange}
+              placeholder="Stara lozinka"
+            />
+            <input
+              type="password"
+              name="NovaLozinka"
+              value={profilForm.NovaLozinka || ""}
+              onChange={handleProfilChange}
+              placeholder="Nova lozinka"
+            />
+
+            <button onClick={handleUpdateProfil}>💾 Sačuvaj</button>
+            <button onClick={() => setEditMode(false)}>⬅ Nazad</button>
           </div>
-        );
+        ) : (
+          <div className="profil-detalji">
+            <ul>
+              <li>Ime: {profil.Ime}</li>
+              <li>Prezime: {profil.Prezime}</li>
+              <li>Naziv agencije: {profil.NazivAgencije}</li>
+              <li>Email: {profil.Email}</li>
+              <li>Korisničko ime: {profil.KorisnickoIme}</li>
+              <li>Datum rođenja: {profil.DatumRodjenja?.split("T")[0]}</li>
+            </ul>
+            <div className="profil-akcije">
+              <button onClick={() => {
+                setProfilForm(profil);
+                setEditMode(true);
+              }}>
+                ✏️ Izmijeni
+              </button>
+            </div>
+          </div>
+        )
+      ) : (
+        <p>Greška pri učitavanju profila.</p>
+      )}
+    </div>
+  );
+
 
         case "destinations":
         return (
@@ -485,6 +670,28 @@ const handleDeletePonuda = async () => {
           </div>
         );
 
+        case "rejected":
+  return (
+    <div>
+      <h2>❌ Odbijene rezervacije</h2>
+      {odbijeneRezervacije.length === 0 ? (
+        <p>Nema odbijenih rezervacija.</p>
+      ) : (
+        <ul className="zahtjevi-lista">
+          {odbijeneRezervacije.map((r) => (
+            <li key={r.idREZERVACIJA} className="zahtjev-item">
+              {r.ImeKorisnika} {r.PrezimeKorisnika} - {r.NazivPonude} (
+              {new Date(r.Datum).toLocaleDateString()}) |{" "}
+              <b>Status:</b>{" "}
+              {r.StatusRezervacije === -1 ? "Odbijena" : r.StatusRezervacije}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+
+
 
       default:
         return <h2>Dobrodošli na dashboard 👋</h2>;
@@ -498,6 +705,7 @@ const handleDeletePonuda = async () => {
     if (activeSection === "archive") fetchPonude();
     if (activeSection === "profile") fetchProfil();
     if (activeSection === "destinations") fetchDestinacije();
+    if (activeSection === "rejected") fetchOdbijeneRezervacije();
   }, [activeSection]);
 
   return (
@@ -515,6 +723,9 @@ const handleDeletePonuda = async () => {
           <button onClick={() => setActiveSection("reservations")}>
             Lista rezervacija
           </button>
+          <button onClick={() => { setActiveSection("rejected") }}>
+            Odbijene rezervacije
+          </button>
           <button onClick={() => setActiveSection("archive")}>
             Arhiva ponuda
           </button>
@@ -524,6 +735,10 @@ const handleDeletePonuda = async () => {
           <button onClick={() => setActiveSection("destinations")}>
             Destinacije
           </button>
+          <button onClick={() => navigate("/reportproblem")}>
+           Prijava problema
+          </button>
+
         </div>
 
         {/* Glavni sadržaj */}

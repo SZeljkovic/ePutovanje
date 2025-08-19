@@ -75,6 +75,14 @@ return (
           Registrujte se
         </Link>
       </p>
+
+      <p style={{ color: "#fff", marginTop: "10px" }}>
+        Zaboravili ste lozinku?{" "}
+        <Link to="/forgotpassword" style={{ color: "#ff9800", textDecoration: "underline" }}>
+           Izmjena lozinke
+        </Link>
+      </p>
+
     </div>
   </div>
 );

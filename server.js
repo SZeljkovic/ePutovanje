@@ -1432,6 +1432,7 @@ app.get('/sve-rezervacije/:id', authenticateToken, authenticateAgency, async (re
                 r.BrojOdraslih,
                 r.BrojDjece,
                 r.StatusRezervacije,
+                r.idKORISNIK,
                 k.Ime AS ImeKorisnika,
                 k.Prezime AS PrezimeKorisnika,
                 k.Email,
