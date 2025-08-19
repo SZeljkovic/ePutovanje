@@ -226,6 +226,35 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
             Destinacije
           </Nav.Link>
         </div>
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
+          <Nav.Link
+            onClick={() => handleSectionChange("problems")}
+            className={`text-white fw-bold px-3 py-2 ${activeSection === 'problems' ? 'active' : ''}`}
+            style={{
+              background: activeSection === 'problems' 
+                ? 'rgba(255,255,255,0.1)' 
+                : 'transparent',
+              transition: 'all 0.2s ease',
+              borderLeft: activeSection === 'problems' ? '3px solid #fff' : '3px solid transparent',
+              borderRadius: '0'
+            }}
+            onMouseEnter={(e) => {
+              if (activeSection !== 'problems') {
+                e.target.style.background = 'rgba(255,255,255,0.05)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeSection !== 'problems') {
+                e.target.style.background = 'transparent';
+              }
+            }}
+          >
+            <i className="fas fa-map-marker-alt me-2"></i>
+            Problemi
+          </Nav.Link>
+        </div>
+
       </Nav>
     </div>
   );

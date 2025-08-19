@@ -3,9 +3,32 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './UpcomingTrips.css';
 
-const UpcomingTrips = () => {
+
+const getDestinationImage = (destinationName) => {
+  if (!destinationName) {
+    return '../../assets/default.jpg';
+  }
+
+  const lowercaseName = destinationName.toLowerCase();
+  const formats = ['.jpg', '.png', '.jpeg', '.webp'];
+
+  for (const format of formats) {
+    try {
+      const imageName = `${lowercaseName}${format}`;
+      return require(`../../assets/${imageName}`);
+    } catch (err) {
+      continue;
+    }
+  }
+
+  console.error(`Slika za destinaciju "${destinationName}" nije pronađena.`);
+  return '/assets/default.jpg';
+};
+
+const UpcomingTrips = ({ searchQuery }) => {
   const [sortOrder, setSortOrder] = useState('default');
   const [trips, setTrips] = useState([]);
+  const [originalTrips, setOriginalTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -13,11 +36,13 @@ const UpcomingTrips = () => {
   const loadRatingForOffer = async (idPONUDA) => {
     try {
       const res = await axios.get(`http://localhost:5000/ponuda/${idPONUDA}/ocjena`);
-      const rating = res.data.averageRating || 0;
-      console.log(`Ocjena za ponudu ${idPONUDA}:`, rating, typeof rating); 
-      return rating;
+      const rating = res.data.averageRating;
+      const numericRating = parseFloat(rating);
+      const validRating = typeof numericRating === 'number' && numericRating >= 0 && numericRating <= 5 ? numericRating : 0;
+      console.log(`Ocjena za ponudu ${idPONUDA}:`, validRating);
+      return validRating;
     } catch (err) {
-      console.error(`Greška pri učitavanju ocjene za ponudu ${idPONUDA}:`, err);
+      console.error(`Greška pri učitavanju ocjene za ponudu ${idPONUDA}:`, err.response?.data || err.message);
       return 0;
     }
   };
@@ -58,11 +83,14 @@ const UpcomingTrips = () => {
           deal: ponuda.NajatraktivnijaPonuda,
           description: ponuda.Opis,
           transportType: ponuda.TipPrevoza,
-          destinations: ponuda.Destinacije
+          destinations: ponuda.Destinacije,
+          rawDepartureDate: new Date(ponuda.DatumPolaska),
+          rawReturnDate: new Date(ponuda.DatumPovratka)
         };
       }));
 
       setTrips(transformedTrips);
+      setOriginalTrips(transformedTrips);
       setError(null);
     } catch (err) {
       console.error("Greška pri učitavanju ponuda:", err);
@@ -72,23 +100,8 @@ const UpcomingTrips = () => {
     }
   };
 
-
-  const getDestinationImage = (destinationName) => {
-    if (!destinationName) return '/assets/default.jpg';
-
-    const name = destinationName.toLowerCase();
-    if (name.includes('maldiv')) return '/assets/maldives.jpg';
-    if (name.includes('dubai')) return '/assets/dubai.jpg';
-    if (name.includes('mauricijus') || name.includes('mauritius')) return '/assets/mauritius.jpg';
-    if (name.includes('kipar') || name.includes('cyprus')) return '/assets/cyprus.jpg';
-
-    return '/assets/default.jpg';
-  };
-
-
   const getSortedTrips = () => {
     const sortedTrips = [...trips];
-
     switch (sortOrder) {
       case 'price':
         return sortedTrips.sort((a, b) => a.currentPrice - b.currentPrice);
@@ -106,8 +119,42 @@ const UpcomingTrips = () => {
     loadAllOffers();
   }, []);
 
+  useEffect(() => {
+    if (originalTrips.length > 0) {
+      handleFilter(searchQuery);
+    }
+  }, [searchQuery, originalTrips]);
+
+
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
+  };
+
+  const handleFilter = (searchData) => {
+    if (!searchData || (!searchData.destination && !searchData.departureDate && !searchData.returnDate && !searchData.budget)) {
+      setTrips(originalTrips);
+      return;
+    }
+
+    const filteredTrips = originalTrips.filter(trip => {
+      const matchesDestination = searchData.destination ?
+        trip.destinations.some(dest =>
+          dest.Naziv.toLowerCase().includes(searchData.destination.toLowerCase())
+        ) : true;
+
+      const matchesDepartureDate = searchData.departureDate ?
+        trip.rawDepartureDate.toISOString().split('T')[0] >= searchData.departureDate : true;
+
+      const matchesReturnDate = searchData.returnDate ?
+        trip.rawReturnDate.toISOString().split('T')[0] <= searchData.returnDate : true;
+
+      const matchesBudget = searchData.budget ?
+        trip.currentPrice <= parseFloat(searchData.budget) : true;
+
+      return matchesDestination && matchesDepartureDate && matchesReturnDate && matchesBudget;
+    });
+
+    setTrips(filteredTrips);
   };
 
   if (loading) {
@@ -195,7 +242,7 @@ const UpcomingTrips = () => {
                     src={trip.image}
                     alt={trip.title}
                     onError={(e) => {
-                      e.target.src = '/assets/default.jpg';
+                      e.target.src = '../../assets/default.jpg';
                     }}
                   />
                 </div>
@@ -214,16 +261,22 @@ const UpcomingTrips = () => {
                         </span>
                       );
                     })}
-                    {trip.rating > 0 && (
-                      <span className="rating-value">{trip.rating}</span>
-                    )}
-                    {trip.spotsLeft <= 10 && (
+                    {trip.spotsLeft <= 10 && trip.spotsLeft > 0 && (
                       <span className="spots-left">
-                        Posljednja {trip.spotsLeft} {trip.spotsLeft === 1 ? 'mjesto' : 'mjesta'}
+                        {trip.spotsLeft === 1
+                          ? 'Posljednje'
+                          : (trip.spotsLeft >= 2 && trip.spotsLeft <= 4)
+                            ? 'Posljednja'
+                            : 'Posljednjih'}{' '}
+                        {trip.spotsLeft}{' '}
+                        {trip.spotsLeft === 1
+                          ? 'mjesto'
+                          : (trip.spotsLeft >= 2 && trip.spotsLeft <= 4)
+                            ? 'mjesta'
+                            : 'mjesta'}
                       </span>
                     )}
                   </div>
-
                 </div>
 
                 <div className="trip-pricing">
@@ -235,7 +288,6 @@ const UpcomingTrips = () => {
                     </div>
                   </div>
                 </div>
-
 
                 <div className="trip-actions">
                   <button
@@ -264,7 +316,6 @@ const UpcomingTrips = () => {
                   >
                     Upit
                   </button>
-
                 </div>
               </div>
             </div>

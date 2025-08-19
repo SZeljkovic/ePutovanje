@@ -58,7 +58,7 @@
 }
 
 .notif-btn::after {
-  content: "3";
+  /*content: "3";*/
   position: absolute;
   top: -6px;
   right: -6px;
@@ -106,7 +106,7 @@
 }
 
 .chat-btn::after {
-  content: "2";
+  /*content: "2";*/
   position: absolute;
   top: -6px;
   right: -6px;

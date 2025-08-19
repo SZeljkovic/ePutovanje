@@ -77,8 +77,6 @@
   z-index: 2;
 }
 
-
-
 .trip-info {
   display: flex;
   align-items: center;
@@ -88,9 +86,9 @@
 
 .trip-dates {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  min-width: 120px;
+  flex-direction: row; 
+  justify-content: space-between; 
+  gap: 60px; 
 }
 
 .date-column {
@@ -117,6 +115,7 @@
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
+  margin-left: 80px;
 }
 
 .trip-image img {
@@ -128,6 +127,7 @@
 .trip-details {
   flex: 1;
   min-width: 0;
+  margin-left: 20px;
 }
 
 .trip-details h3 {
@@ -163,6 +163,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  margin-right: 50px;
 }
 
 .price-column {
