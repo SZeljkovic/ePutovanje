@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './About.css';
 
-import img1 from '../../assets/vienna.jpg';
-import img2 from '../../assets/maldives.jpg';
+import img1 from '../../assets/beč.jpg';
+import img2 from '../../assets/maldivi.jpg';
 import img3 from '../../assets/mauritius.jpg';
 import img4 from '../../assets/innsbruck.jpg';
 import img5 from '../../assets/dubai.jpg';

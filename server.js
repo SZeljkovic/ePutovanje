@@ -916,7 +916,6 @@ app.get('/zahtjevi-ponuda/:id', authenticateToken, authenticateAdmin, async (req
 
 
 
-
 app.get('/ponude', async (req, res) => {
     try {
         const query = `
@@ -1659,16 +1658,16 @@ app.post('/recenzija', authenticateToken, async (req, res) => {
     }
 });
 
+
 app.get('/ponuda/:id/ocjena', async (req, res) => {
     const idPONUDA = parseInt(req.params.id);
 
     try {
-        const [rows] = await pool.query('CALL GetAverageRating(?, @avgRating); SELECT @avgRating AS averageRating;', [idPONUDA]);
-
-        const averageRating = rows[1][0].averageRating;
-        res.json({ averageRating: averageRating || null });
+        const [rows] = await db.promise().query('SELECT IFNULL(ROUND(AVG(Ocjena)), 0) AS averageRating FROM RECENZIJA WHERE idPONUDA = ?', [idPONUDA]);
+        const averageRating = rows[0].averageRating;
+        res.json({ averageRating });
     } catch (err) {
-        console.error(err);
+        console.error('Error getting rating for offer:', idPONUDA, err);
         res.status(500).json({ error: 'Greška pri dobijanju ocjene' });
     }
 });

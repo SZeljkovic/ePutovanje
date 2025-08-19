@@ -1,6 +1,6 @@
 import React from 'react'
 import './Offers.css'
-import vienna from '../../assets/vienna.jpg'
+import vienna from '../../assets/beč.jpg'
 import istanbul from '../../assets/istanbul.jpg'
 import innsbruck from '../../assets/innsbruck.jpg'
 
