@@ -1,0 +1,335 @@
+.agency-home {
+  background-color: #1e1e1e; /* tamna pozadina */
+  min-height: 100vh;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-container {
+  display: flex;
+  flex: 1;
+  padding: 20px;
+  gap: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #2c2c2c;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar button {
+  background-color: transparent;
+  color: white;
+  border: 2px solid #ff9800;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 15px;
+  text-align: left;
+}
+
+.sidebar button:hover {
+  background-color: #ff9800;
+  color: #1e1e1e;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  background-color: #2c2c2c;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+/* Forma */
+.agency-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.agency-form input,
+.agency-form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  color:#1e1e1e;
+}
+
+.agency-form input:focus,
+.agency-form textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ff9800;
+}
+
+.agency-form button {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 16px;
+}
+
+.agency-form button:hover {
+  background-color: #e68900;
+}
+
+
+.dest-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.dest-table th, .dest-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.dest-table th {
+  background-color: #f4f4f4;
+  text-align: left;
+}
+
+.zahtjevi-lista {
+  list-style: none;
+  padding: 0;
+}
+
+.zahtjev-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.zahtjev-item:hover {
+  background: #333;
+  color: #ff9800;
+}
+
+.zahtjev-detalji {
+  background: #2c2c2c;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.zahtjev-detalji ul {
+  list-style: none;
+  padding: 0;
+}
+
+.zahtjev-detalji li {
+  margin-bottom: 8px;
+}
+
+.zahtjev-akcije {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-accept {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-accept:hover {
+  background: #43a047;
+}
+
+.btn-reject {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-reject:hover {
+  background: #d32f2f;
+}
+
+.btn-back {
+  background: #777;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  background: #555;
+}
+
+/* 📦 Lista ponuda */
+.ponude-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ponuda-item {
+  padding: 12px 16px;
+  margin: 6px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.ponuda-item:hover {
+  background: #f5f5f5;
+  transform: translateX(4px);
+}
+
+
+/* 📝 Detalji ponude */
+.ponuda-detalji {
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 20px;
+  background: #2c2c2c;   /* tamna pozadina */
+  margin-top: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  color: #f1f1f1;        /* svijetli tekst */
+}
+
+.ponuda-detalji h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #ff9800;         /* narandžasta za naslov */
+}
+
+.ponuda-detalji p {
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+/* 🔘 Akcije */
+.ponuda-akcije button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.ponuda-akcije button:nth-child(1) { /* Izmijeni */
+  background: #ff9800;
+  color: #fff;
+}
+.ponuda-akcije button:nth-child(1):hover {
+  background: #e68900;
+}
+
+.ponuda-akcije button:nth-child(2) { /* Obriši */
+  background: #d9534f;
+  color: #fff;
+}
+.ponuda-akcije button:nth-child(2):hover {
+  background: #c9302c;
+}
+
+.ponuda-akcije button:nth-child(3) { /* Nazad */
+  background: #555;
+  color: #fff;
+}
+.ponuda-akcije button:nth-child(3):hover {
+  background: #444;
+}
+
+/* ✏️ Forma za edit */
+.ponuda-edit-form {
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 20px;
+  background: #1e1e1e;   /* još tamnija pozadina */
+  margin-top: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  color: #f1f1f1;
+}
+
+.ponuda-edit-form h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #ff9800;
+}
+
+.ponuda-edit-form input,
+.ponuda-edit-form textarea,
+.ponuda-edit-form select {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #2c2c2c;
+  color: #f1f1f1;
+}
+
+.ponuda-edit-form input:focus,
+.ponuda-edit-form textarea:focus,
+.ponuda-edit-form select:focus {
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 0 2px #ff9800;
+}
+
+.ponuda-edit-form label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: #ddd;
+}
+
+.ponuda-edit-form button {
+  margin-top: 10px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.ponuda-edit-form button:nth-child(1) { /* Sačuvaj */
+  background: #28a745;
+  color: #fff;
+}
+.ponuda-edit-form button:nth-child(1):hover {
+  background: #218838;
+}
+
+.ponuda-edit-form button:nth-child(2) { /* Nazad */
+  background: #555;
+  color: #fff;
+}
+.ponuda-edit-form button:nth-child(2):hover {
+  background: #444;
+}
+

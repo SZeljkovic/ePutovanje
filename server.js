@@ -1057,7 +1057,7 @@ app.get('/ponuda/:id', async (req, res) => {
 });
 
 
-app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAdmin, async (req, res) => {
+app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAgency, async (req, res) => {
     const idPONUDA = req.params.id;
 
     try {
@@ -1659,7 +1659,7 @@ app.post('/recenzija', authenticateToken, async (req, res) => {
     }
 });
 
-router.get('/ponuda/:id/ocjena', async (req, res) => {
+app.get('/ponuda/:id/ocjena', async (req, res) => {
     const idPONUDA = parseInt(req.params.id);
 
     try {
