@@ -23,10 +23,12 @@ const Header = ({ setActiveSection, logout, navigate }) => {
         </button>
         <button
           className="notif-btn"
-          onClick={() => alert("Notifikacije će biti ovdje 😉")}
+          onClick={() => navigate("/notifications")}
+          title="Obavještenja"
         >
-          <img src={bellIcon} alt="bell" className="bell-icon" />
+        <img src={bellIcon} alt="bell" className="bell-icon" />
         </button>
+
         <button
           className="logout-btn-header"
           onClick={() => {

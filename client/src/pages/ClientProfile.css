@@ -1,0 +1,144 @@
+.client-profile-page {
+  background-color: #1e1e1e;
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: #fff;
+}
+
+.client-profile-page h2 {
+  color: #ff9800;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.profile-info {
+  background-color: #2c2c2c;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.profile-info p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.profile-edit-form {
+  background-color: #2c2c2c;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-edit-form h3 {
+  color: #ff9800;
+  margin-bottom: 10px;
+}
+
+.profile-edit-form input {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  color:#1e1e1e;
+}
+
+.profile-edit-form input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ff9800;
+}
+
+.profile-edit-form button {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.profile-edit-form button:hover {
+  background-color: #e68900;
+}
+
+.profile-message {
+  color: #ff9800;
+  font-size: 14px;
+}
+
+.profile-notif-btn {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.profile-notif-btn a {
+  background-color: #ff9800;
+  padding: 12px 20px;
+  border-radius: 6px;
+  color: white;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.profile-notif-btn a:hover {
+  background-color: #e68900;
+}
+
+
+.profile-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center; /* sve u sredini */
+  gap: 15px;
+  flex-wrap: wrap; /* da se prilagodi na mobilnim */
+}
+
+.notif-link,
+.reservations-link {
+  display: inline-block;
+  background-color: #ff9800;
+  padding: 12px 20px;
+  border-radius: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+  text-align: center;
+}
+
+.back-btn{
+    display: inline-block;          /* sprječava da tekst "probija" okvir */
+  background-color: #ff9800;
+  padding: 10px 18px;             /* malo smanjen padding da bolje leži */
+  border-radius: 6px;
+  color: white;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+  text-align: center;
+  min-width: 100px;
+}
+
+.back-btn:hover,
+.notif-link:hover,
+.reservations-link:hover {
+  background-color: #e68900;
+}
+
+

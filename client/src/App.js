@@ -10,6 +10,9 @@ import Inbox from './pages/Inbox';
 import Header from './components/Header/Header';
 import ReportProblem from './pages/ReportProblem';
 import ForgotPassword from './pages/ForgotPassword';
+import Notifications from './pages/Notifications';
+import ClientProfile from './pages/ClientProfile';
+import MyReservations from './pages/MyReservations';
 
 const App = () => {
   const location = useLocation();
@@ -42,6 +45,9 @@ const App = () => {
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/reportproblem" element={<ReportProblem />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/clientprofile" element={<ClientProfile />} />
+        <Route path="/myreservations" element={<MyReservations />} />
       </Routes>
       <Footer />
     </>

@@ -1,0 +1,78 @@
+.notifications-page {
+  background-color: #1e1e1e;
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: #fff;
+}
+
+.notifications-page h2 {
+  color: #ff9800;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.notif-loading,
+.notif-empty {
+  text-align: center;
+  color: #bbb;
+  margin-top: 30px;
+  font-size: 18px;
+}
+
+.notif-list {
+  list-style: none;
+  padding: 0;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.notif-item {
+  background-color: #2c2c2c;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notif-item.unread {
+  border-left: 6px solid #ff9800;
+}
+
+.notif-item.read {
+  opacity: 0.8;
+}
+
+.notif-text {
+  font-size: 16px;
+}
+
+.notif-date {
+  font-size: 13px;
+  color: #aaa;
+  text-align: right;
+}
+
+/* Dugme nazad */
+.notif-back-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.notif-back-btn {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.notif-back-btn:hover {
+  background-color: #e68900;
+}

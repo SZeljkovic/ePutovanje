@@ -2136,6 +2136,28 @@ app.put('/moje-rezervacije/:id/otkazi', authenticateToken, async (req, res) => {
     }
 });
 
+
+// Dohvatanje svih obavještenja za prijavljenog korisnika
+app.get('/obavjestenja', authenticateToken, async (req, res) => {
+    const idKorisnik = req.user.idKORISNIK;
+
+    try {
+        const [rows] = await db.promise().query(
+            `SELECT idOBAVJEŠTENJE, Sadržaj, DatumVrijeme, Pročitano
+             FROM obavještenje
+             WHERE idKORISNIK = ?
+             ORDER BY DatumVrijeme DESC`,
+            [idKorisnik]
+        );
+
+        res.json(rows);
+    } catch (err) {
+        console.error("Greška pri dohvatanju obavještenja:", err);
+        res.status(500).json({ error: "Greška na serveru" });
+    }
+});
+
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

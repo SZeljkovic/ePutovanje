@@ -44,6 +44,7 @@ const Navbar = () => {
               <FaUserCircle
                 size={28}
                 style={{ cursor: "pointer" }}
+                onClick={() => navigate("/clientprofile")}
                 title="Profil"
               />
 
