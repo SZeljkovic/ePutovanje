@@ -115,6 +115,7 @@ const ClientProfile = () => {
         <button className="back-btn" onClick={() => navigate("/")}>⬅ Nazad</button>
         <Link to="/notifications" className="notif-link">🔔 Moja obavještenja</Link>
         <Link to="/myreservations" className="reservations-link">📌 Moje rezervacije</Link>
+        <Link to="/reportproblem" className="problem-link">⚠️ Prijavi problem</Link>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import Notifications from './pages/Notifications';
 import ClientProfile from './pages/ClientProfile';
 import MyReservations from './pages/MyReservations';
+import OfferDetails from './pages/OfferDetails';
 
 const App = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/clientprofile" element={<ClientProfile />} />
         <Route path="/myreservations" element={<MyReservations />} />
+        <Route path="/offerdetails/:id" element={<OfferDetails />} />
       </Routes>
       <Footer />
     </>

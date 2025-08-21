@@ -6,7 +6,7 @@ import './UpcomingTrips.css';
 
 const getDestinationImage = (destinationName) => {
   if (!destinationName) {
-    return '../../assets/default.jpg';
+    return '/assets/default.jpg';
   }
 
   const lowercaseName = destinationName.toLowerCase();
@@ -14,8 +14,8 @@ const getDestinationImage = (destinationName) => {
 
   for (const format of formats) {
     try {
-      const imageName = `${lowercaseName}${format}`;
-      return require(`../../assets/${imageName}`);
+      const imagePath = `/assets/${lowercaseName}${format}`;
+    return imagePath;
     } catch (err) {
       continue;
     }
@@ -242,7 +242,7 @@ const UpcomingTrips = ({ searchQuery }) => {
                     src={trip.image}
                     alt={trip.title}
                     onError={(e) => {
-                      e.target.src = '../../assets/default.jpg';
+                      e.currentTarget.src = '/assets/default.jpg';
                     }}
                   />
                 </div>
@@ -293,8 +293,13 @@ const UpcomingTrips = ({ searchQuery }) => {
                   <button
                     className="btn-view"
                     onClick={() => {
-                      console.log('Pogledaj ponudu:', trip.id);
-                    }}
+                      const token = localStorage.getItem("token"); // ili sessionStorage, zavisi kako ti radi login
+                        if (token) {
+                        navigate(`/offerdetails/${trip.id}`);
+                        } else {
+                        navigate("/login");
+                        }
+                        }}
                   >
                     Pogledaj
                   </button>
@@ -311,8 +316,13 @@ const UpcomingTrips = ({ searchQuery }) => {
                   <button
                     className="btn-share"
                     onClick={() => {
-                      navigate('/inbox');
-                    }}
+                      const token = localStorage.getItem("token"); 
+                      if (token) {
+                      navigate(`/inbox`);
+                      } else {
+                       navigate("/login");
+                      }
+                  }}
                   >
                     Upit
                   </button>
