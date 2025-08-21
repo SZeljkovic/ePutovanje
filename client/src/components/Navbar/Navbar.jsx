@@ -26,9 +26,38 @@ const Navbar = () => {
       <img src={logo} alt="" className="logo" />
       <ul>
         <li><Link to="/">Početna</Link></li>
-        <li>Pretraga</li>
-        <li>O nama</li>
-        <li>Kontakt</li>
+        <li>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              document.getElementById("search")?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            Pretraga
+          </span>
+        </li>
+
+        <li>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            O nama
+          </span>
+        </li>
+        <li>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            Kontakt
+          </span>
+      </li>
+
         <li>
           {loggedIn ? (
             <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>

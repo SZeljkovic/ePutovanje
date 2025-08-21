@@ -19,20 +19,30 @@ const Home = () => {
 
   return (
     <>
-      <Hero onSearch={handleSearch}/>
+      <Hero onSearch={handleSearch} />
       <div className='container'>
         <Navbar />
-        <Title subTitle='Ponude'  />
-        <UpcomingTrips searchQuery={searchQuery}/>
+        <Title subTitle='Ponude' />
+        <div id="search">
+        <UpcomingTrips searchQuery={searchQuery} />
+        </div>
         <Title subTitle='Nudimo:' title='Najatraktivnije ponude!' />
         <Offers />
+
         <Title subTitle='O nama:' title='Zbog vašeg ugodnijeg putovanja!' />
-        <About />
+        <div id="about">
+          <About />
+        </div>
+
         <Title subTitle='Šta naši klijenti kažu:' />
-        <Testimonials/>
+        <Testimonials />
+
         <Title subTitle='Kontakt: ' title='Slobodno nam se javi 📞' />
-        <Contact/>
+        <div id="contact">
+          <Contact />
+        </div>
       </div>
+
     </>
   );
 };

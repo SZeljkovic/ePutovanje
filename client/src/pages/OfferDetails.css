@@ -1,0 +1,211 @@
+.offer-details {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  color: #333;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #4CAF50;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.offer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.offer-header h2 {
+  font-size: 28px;
+  color: #222;
+}
+
+.price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.offer-meta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.deal-tag {
+  background: #ffe7e7;
+  color: #e74c3c;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.offer-description {
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.destinations {
+  margin: 20px 0;
+}
+
+.destinations h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.destinations ul {
+  list-style: none;
+  padding: 0;
+}
+
+.destinations li {
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.reviews-section {
+  margin-top: 40px;
+}
+
+.avg-rating {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.review-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.review-item {
+  background: #fafafa;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stars {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.review-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rating-input .star {
+  font-size: 22px;
+  cursor: pointer;
+  color: #ddd;
+}
+
+.rating-input .star.filled {
+  color: #ffc107;
+}
+
+textarea {
+  min-height: 80px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  resize: vertical;
+}
+
+.submit-review {
+  align-self: flex-start;
+  background: #4CAF50;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit-review:hover {
+  background: #45a049;
+}
+
+
+.reservation-section {
+  margin: 30px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+}
+
+.reservation-section h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.reservation-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reservation-section label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+}
+
+.reservation-section input {
+  width: 80px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-left: 10px;
+}
+
+.reserve-button {
+  margin-top: 10px;
+  background: #ff9800;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.reserve-button:hover {
+  background: #e68900;
+}
+
+.reservation-message {
+  margin-top: 10px;
+  font-weight: 600;
+}
