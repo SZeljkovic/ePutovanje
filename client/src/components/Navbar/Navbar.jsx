@@ -7,7 +7,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [sticky, setSticky] = useState(false);
-  const { loggedIn, logout } = useContext(AuthContext);
+const { loggedIn, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,38 +56,54 @@ const Navbar = () => {
           >
             Kontakt
           </span>
+		  
       </li>
 
-        <li>
-          {loggedIn ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-              {/* Ikonica za inbox */}
-              <FaEnvelope
-                size={24}
-                style={{ cursor: "pointer" }}
-                onClick={() => navigate("/inbox")}
-                title="Poruke"
-              />
+<li>
+  {loggedIn ? (
+    <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+	 {/* Uporedi ponude - samo za klijenta */}
+      {user?.TipKorisnika === 2 && (
+        <span
+          style={{ cursor: "pointer" }}
+          onClick={() => window.dispatchEvent(new CustomEvent("openCompareModal"))}
+        >
+          Uporedi ponude
+        </span>
+      )}
+      {/* Ikonica za inbox */}
+      <FaEnvelope
+        size={24}
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate("/inbox")}
+        title="Poruke"
+      />
 
-              {/* Ikonica profila */}
-              <FaUserCircle
-                size={28}
-                style={{ cursor: "pointer" }}
-                onClick={() => navigate("/clientprofile")}
-                title="Profil"
-              />
+      {/* Ikonica profila */}
+      <FaUserCircle
+        size={28}
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate("/clientprofile")}
+        title="Profil"
+      />
 
-              {/* Dugme odjave */}
-              <button className="btn" onClick={handleLogout}>
-                Odjava
-              </button>
-            </div>
-          ) : (
-            <Link to="/login">
-              <button className="btn">Prijava</button>
-            </Link>
-          )}
-        </li>
+      {/* Dugme odjave */}
+      <button className="btn" onClick={handleLogout}>
+        Odjava
+      </button>
+
+     
+    </div>
+  ) : (
+    <Link to="/login">
+      <button className="btn">Prijava</button>
+    </Link>
+  )}
+</li>
+
+
+
+
       </ul>
     </nav>
   );
