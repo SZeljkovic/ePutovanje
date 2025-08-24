@@ -26,7 +26,7 @@ const Home = () => {
         <div id="search">
         <UpcomingTrips searchQuery={searchQuery} />
         </div>
-        <Title subTitle='Nudimo:' title='Najatraktivnije ponude!' />
+        <Title subTitle='Nudimo:' title='Najpopularnije ove sezone!' />
         <Offers />
 
         <Title subTitle='O nama:' title='Zbog vašeg ugodnijeg putovanja!' />

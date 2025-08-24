@@ -7,7 +7,6 @@ const CompareOffers = () => {
   const [comparison, setComparison] = useState(null);
   const [error, setError] = useState("");
 
-  // Učitaj sve ponude
   useEffect(() => {
     const fetchOffers = async () => {
       try {
@@ -24,7 +23,6 @@ const CompareOffers = () => {
     fetchOffers();
   }, []);
 
-  // Kada su odabrane 2 ponude, povuci uporedi rutu
   useEffect(() => {
     const fetchComparison = async () => {
       if (selected.length === 2) {
@@ -53,14 +51,21 @@ const CompareOffers = () => {
     }
   };
 
-  // Helper funkcija za naglašavanje razlika
   const highlightClass = (val1, val2) => {
     return val1 !== val2 ? "different" : "";
   };
 
+  const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+};
+
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Poredi ponude</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">Poredi ponude</h2>
 
       {error && <p className="text-red-500">{error}</p>}
 
@@ -131,20 +136,20 @@ const CompareOffers = () => {
                 <tr>
                   <td>Polazak</td>
                   <td className={highlightClass(comparison.ponuda1.DatumPolaska, comparison.ponuda2.DatumPolaska)}>
-                    {comparison.ponuda1.DatumPolaska}
+                    {formatDate(comparison.ponuda1.DatumPolaska)}
                   </td>
                   <td className={highlightClass(comparison.ponuda2.DatumPolaska, comparison.ponuda1.DatumPolaska)}>
-                    {comparison.ponuda2.DatumPolaska}
+                     {formatDate(comparison.ponuda2.DatumPolaska)}
                   </td>
                 </tr>
 
                 <tr>
                   <td>Povratak</td>
                   <td className={highlightClass(comparison.ponuda1.DatumPovratka, comparison.ponuda2.DatumPovratka)}>
-                    {comparison.ponuda1.DatumPovratka}
+                    {formatDate(comparison.ponuda1.DatumPovratka)}
                   </td>
                   <td className={highlightClass(comparison.ponuda2.DatumPovratka, comparison.ponuda1.DatumPovratka)}>
-                    {comparison.ponuda2.DatumPovratka}
+                    {formatDate(comparison.ponuda2.DatumPovratka)}
                   </td>
                 </tr>
 

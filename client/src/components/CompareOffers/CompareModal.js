@@ -1,5 +1,5 @@
 import React from "react";
-import "./CompareOffers.css"; // koristi iste stilove za overlay i modal
+import "./CompareOffers.css"; 
 
 const CompareModal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -14,6 +14,8 @@ const CompareModal = ({ isOpen, onClose, children }) => {
             background: "transparent",
             fontSize: "1.5rem",
             cursor: "pointer",
+            color: "white",
+            overflow: "hidden"
           }}
           onClick={onClose}
         >

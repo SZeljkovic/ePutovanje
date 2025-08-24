@@ -61,7 +61,7 @@ const { loggedIn, user, logout } = useContext(AuthContext);
 
 <li>
   {loggedIn ? (
-    <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "35px" }}>
 	 {/* Uporedi ponude - samo za klijenta */}
       {user?.TipKorisnika === 2 && (
         <span

@@ -34,7 +34,7 @@ const Testimonials = () => {
     return (
         <div className='testimonials'> 
             <img src={next_icon} alt="" className='next-btn' onClick={slideForward} />
-            <img src={back_icon} alt="" className='back-btn' onClick={slideBackward} />
+            <img src={back_icon} alt="" className='back-btn-t' onClick={slideBackward} />
             <div className="slider">
                 <ul ref={slider}>
                     <li>
@@ -47,7 +47,7 @@ const Testimonials = () => {
                                 </div>
                             </div>
                         </div>
-                        <p>ePutovanje mi je omogućilo da brzo pronađem i rezervišem putovanje koje sam željela, sve na jednom mjestu!</p>
+                        <p className="testimonial-text">  ePutovanje mi je omogućilo da brzo pronađem i rezervišem putovanje koje sam željela, sve na jednom mjestu!</p>
                     </li>
                     <li>
                         <div className="slide">
@@ -59,7 +59,7 @@ const Testimonials = () => {
                                 </div>
                             </div>
                         </div>
-                        <p>Rezervacija preko ePutovanja je jednostavna i sigurna, a sve informacije su jasno prikazane.</p>
+                        <p className="testimonial-text">Rezervacija preko ePutovanja je jednostavna i sigurna, a sve informacije su jasno prikazane.</p>
                     </li>
                     <li>
                         <div className="slide">
@@ -71,7 +71,7 @@ const Testimonials = () => {
                                 </div>
                             </div>
                         </div>
-                        <p>Konačno platforma koja mi štedi vrijeme – od planiranja do rezervacije putovanja.</p>
+                        <p className="testimonial-text">Konačno platforma koja mi štedi vrijeme – od planiranja do rezervacije putovanja.</p>
                     </li>
                     <li>
                         <div className="slide">
@@ -83,7 +83,7 @@ const Testimonials = () => {
                                 </div>
                             </div>
                         </div>
-                        <p>Omogućava direktnu komunikaciju sa turističkim agencijama – sve je brzo i profesionalno.</p>
+                        <p className="testimonial-text">Omogućava direktnu komunikaciju sa turističkim agencijama – sve je brzo i profesionalno.</p>
                     </li>
                     <li>
                         <div className="slide">
@@ -95,7 +95,7 @@ const Testimonials = () => {
                                 </div>
                             </div>
                         </div>
-                        <p>Najbolja online platforma za uspoređivanje različitih putovanja i planiranje odmora.</p>
+                        <p className="testimonial-text">Najbolja online platforma za uspoređivanje različitih putovanja i planiranje odmora.</p>
                     </li>
                 </ul>
             </div>

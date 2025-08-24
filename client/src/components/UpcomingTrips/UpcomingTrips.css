@@ -24,20 +24,42 @@
   margin: 0;
 }
 
+.sort-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
 .sort-dropdown select {
-  padding: 10px 30px 10px 15px;
+  padding: 10px 35px 10px 15px;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background: white;
+  border-radius: 10px;
+  background: #fff;
   font-size: 14px;
-  color: #666;
+  font-weight: 500;
+  color: #444;
   cursor: pointer;
   appearance: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+ 
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 8px center;
+  background-position: right 10px center;
   background-repeat: no-repeat;
   background-size: 16px;
 }
+
+.sort-dropdown select:hover {
+  border-color: #c0c0c0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.sort-dropdown select:focus {
+  outline: none;
+  border-color: #3b82f6; 
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+
 
 .trips-grid {
   display: flex;
