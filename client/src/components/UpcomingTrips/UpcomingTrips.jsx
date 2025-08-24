@@ -85,7 +85,8 @@ const UpcomingTrips = ({ searchQuery }) => {
           transportType: ponuda.TipPrevoza,
           destinations: ponuda.Destinacije,
           rawDepartureDate: new Date(ponuda.DatumPolaska),
-          rawReturnDate: new Date(ponuda.DatumPovratka)
+          rawReturnDate: new Date(ponuda.DatumPovratka),
+          korisnickoImeAgencije: ponuda.KorisnickoIme
         };
       }));
 
@@ -318,7 +319,9 @@ const UpcomingTrips = ({ searchQuery }) => {
                     onClick={() => {
                       const token = localStorage.getItem("token"); 
                       if (token) {
-                      navigate(`/inbox`);
+                      navigate(`/inbox`, {
+                        state: { korisnickoImePrimaoca: trip.korisnickoImeAgencije } 
+                      });
                       } else {
                        navigate("/login");
                       }

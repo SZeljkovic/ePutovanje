@@ -120,16 +120,18 @@ const OfferDetails = () => {
       </div>
 
       <div className="offer-meta">
-        <span>
-          📅 {new Date(offer.DatumPolaska).toLocaleDateString()} -{" "}
-          {new Date(offer.DatumPovratka).toLocaleDateString()}
-        </span>
-        <span>🚌 Prevoz: {offer.TipPrevoza}</span>
-        <span>🎟 Slobodna mjesta: {offer.BrojSlobodnihMjesta}</span>
-        {offer.NajatraktivnijaPonuda && (
-          <span className="deal-tag">🔥 Top ponuda</span>
-        )}
-      </div>
+      <span>
+        📅 {new Date(offer.DatumPolaska).toLocaleDateString()} -{" "}
+        {new Date(offer.DatumPovratka).toLocaleDateString()}
+      </span>
+      <span>🚌 Prevoz: {offer.TipPrevoza}</span>
+      <span>🎟 Slobodna mjesta: {offer.BrojSlobodnihMjesta}</span>
+      <span>🏢 Agencija: {offer.NazivAgencije + " (" + offer.KorisnickoIme + ") "}</span> {/* DODANO */}
+      {offer.NajatraktivnijaPonuda && (
+        <span className="deal-tag">🔥 Top ponuda</span>
+      )}
+    </div>
+
 
       <div className="offer-description">
         <p>{offer.Opis}</p>
