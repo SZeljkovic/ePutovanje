@@ -868,7 +868,7 @@ app.put('/zahtjevi-ponuda/:id/status', authenticateToken, authenticateAdmin, asy
 app.get('/zahtjevi-ponuda', authenticateToken, authenticateAdmin, async (req, res) => {
     try {
         const [ponude] = await db.promise().query(
-            "SELECT * FROM ponuda WHERE StatusPonude = 0"
+            "SELECT * FROM ponuda p JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK WHERE StatusPonude = 0"
         );
         res.json(ponude);
     } catch (err) {
@@ -930,6 +930,7 @@ app.get('/ponude', async (req, res) => {
                 p.BrojSlobodnihMjesta,
                 p.NajatraktivnijaPonuda,
                 p.idKORISNIK,
+                k.KorisnickoIme AS KorisnickoIme,
                 d.idDESTINACIJA,
                 d.Naziv AS NazivDestinacije,
                 d.Opis AS OpisDestinacije,
@@ -940,6 +941,8 @@ app.get('/ponude', async (req, res) => {
                 ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
             LEFT JOIN 
                 destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            JOIN 
+                korisnik k ON p.idKORISNIK = k.idKORISNIK
             WHERE 
                 p.StatusPonude = 1
             ORDER BY 
@@ -964,6 +967,7 @@ app.get('/ponude', async (req, res) => {
                     BrojSlobodnihMjesta: row.BrojSlobodnihMjesta,
                     NajatraktivnijaPonuda: !!row.NajatraktivnijaPonuda,
                     idKORISNIK: row.idKORISNIK,
+                    KorisnickoIme: row.KorisnickoIme,
                     Destinacije: []
                 };
             }
@@ -1002,6 +1006,8 @@ app.get('/ponuda/:id', async (req, res) => {
                 p.BrojSlobodnihMjesta,
                 p.NajatraktivnijaPonuda,
                 p.idKORISNIK,
+                k.NazivAgencije AS NazivAgencije,
+                k.KorisnickoIme AS KorisnickoIme,
                 d.idDESTINACIJA,
                 d.Naziv AS NazivDestinacije,
                 d.Opis AS OpisDestinacije,
@@ -1012,11 +1018,11 @@ app.get('/ponuda/:id', async (req, res) => {
                 ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
             JOIN 
                 destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            JOIN 
+                korisnik k ON p.idKORISNIK = k.idKORISNIK
             WHERE 
                 p.idPONUDA = ?
         `;
-
-        //Potencijalni ce i ovdje mozda trebati dodati where statusponude=1
 
         const [rows] = await db.promise().query(query, [ponudaId]);
 
@@ -1035,6 +1041,8 @@ app.get('/ponuda/:id', async (req, res) => {
             BrojSlobodnihMjesta: rows[0].BrojSlobodnihMjesta,
             NajatraktivnijaPonuda: !!rows[0].NajatraktivnijaPonuda,
             idKORISNIK: rows[0].idKORISNIK,
+            NazivAgencije: rows[0].NazivAgencije,
+            KorisnickoIme: rows[0].KorisnickoIme, 
             Destinacije: []
         };
 
@@ -1054,6 +1062,7 @@ app.get('/ponuda/:id', async (req, res) => {
         res.status(500).json({ error: "Greška na serveru prilikom dobavljanja ponude." });
     }
 });
+
 
 
 app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAgency, async (req, res) => {

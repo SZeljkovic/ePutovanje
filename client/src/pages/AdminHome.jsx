@@ -789,7 +789,7 @@ const AdminHome = () => {
                 {offerRequests.map(offer => (
                   <div key={offer.idPONUDA} className="offer-card">
                     <div className="offer-info">
-                      <h4>Ponuda za: {offer.NazivDestinacije || "Nije definirano"}</h4>
+                      <h4>Ponuda od: {offer.NazivAgencije || "Nije definisano"}</h4>
                       <p><strong>Cijena:</strong> {offer.Cijena} KM</p>
                       <p><strong>Datum polaska:</strong> {new Date(offer.DatumPolaska).toLocaleDateString()}</p>
                       <p><strong>Datum povratka:</strong> {new Date(offer.DatumPovratka).toLocaleDateString()}</p>
@@ -797,7 +797,6 @@ const AdminHome = () => {
                       <p><strong>Broj mjesta:</strong> {offer.BrojSlobodnihMjesta}</p>
                       <p><strong>Najatraktivnija ponuda:</strong> {offer.NajatraktivnijaPonuda ? 'Da' : 'Ne'}</p>
                       <p><strong>Opis:</strong> {offer.Opis}</p>
-                      {offer.NazivAgencije && <p><strong>Agencija:</strong> {offer.NazivAgencije}</p>}
                     </div>
                     <div className="offer-actions">
                       <button

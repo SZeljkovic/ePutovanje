@@ -209,3 +209,17 @@ textarea {
   margin-top: 10px;
   font-weight: 600;
 }
+
+.offer-meta span {
+  background: #f1f1f1;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.offer-meta span:nth-child(4) {
+  background: #e6f7ff;
+  color: #0077b6;
+  font-weight: 600;
+}
+
+

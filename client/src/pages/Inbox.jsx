@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
 import axios from "axios";
 import "./Inbox.css";
 
 const API_BASE = "http://localhost:5000"; 
 
 const Inbox = () => {
+  const location = useLocation();
   const [chatovi, setChatovi] = useState([]);
   const [odabraniChat, setOdabraniChat] = useState(null);
   const [poruke, setPoruke] = useState([]);
   const [novaPoruka, setNovaPoruka] = useState("");
   const [korisnickoImePrimaoca, setKorisnickoImePrimaoca] = useState("");
+
+  useEffect(() => {
+  if (location.state?.korisnickoImePrimaoca) {
+    setKorisnickoImePrimaoca(location.state.korisnickoImePrimaoca);
+  }
+}, [location.state]);
 
   const token = localStorage.getItem("token");
 
