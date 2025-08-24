@@ -21,11 +21,9 @@ const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // state
   const [activeSection, setActiveSection] = useState("home");
   const [openCompareModal, setOpenCompareModal] = useState(false);
 
-  // event listener za poredjenje
   useEffect(() => {
     const handler = () => setOpenCompareModal(true);
     window.addEventListener("openCompareModal", handler);

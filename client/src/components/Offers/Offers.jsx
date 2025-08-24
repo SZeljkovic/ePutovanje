@@ -2,7 +2,7 @@ import React from 'react'
 import './Offers.css'
 import vienna from '../../assets/beč.jpg'
 import istanbul from '../../assets/istanbul.jpg'
-import innsbruck from '../../assets/innsbruck.jpg'
+import paris from '../../assets/pariz.jpg'
 
 const Offers = () => {
   return (
@@ -20,9 +20,9 @@ const Offers = () => {
             </div>
         </div>
         <div className="offer">
-            <img src={innsbruck} alt="" />
+            <img src={paris} alt="" />
             <div className="caption">
-                <p>Insbruk</p>
+                <p>Pariz</p>
             </div>
         </div>
     </div>

@@ -163,7 +163,7 @@ const OfferDetails = () => {
             />
           </label>
           <button type="submit" className="reserve-button">
-            🛒 Rezerviši
+            Rezerviši
           </button>
         </form>
         {reservationMessage && (

@@ -19,7 +19,6 @@ const SearchFilter = ({ onSearch }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Pozivamo callback funkciju sa podacima pretrage
     onSearch(searchData);
   };
 

@@ -104,7 +104,7 @@ const ClientProfile = () => {
 
             {message && <p className="profile-message">{message}</p>}
 
-            <button type="submit">💾 Sačuvaj promjene</button>
+            <button type="submit">Sačuvaj promjene</button>
           </form>
         </div>
       ) : (
