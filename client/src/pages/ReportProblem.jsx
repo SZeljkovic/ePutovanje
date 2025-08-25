@@ -9,7 +9,7 @@ const ReportProblem = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token"); // pretpostavljam da čuvaš token u localStorage
+  const token = localStorage.getItem("token"); 
   const API_BASE = "http://localhost:5000";
 
   const handleSubmit = async (e) => {
@@ -33,7 +33,7 @@ const ReportProblem = () => {
 
   return (
     <div className="report-container">
-      <h2>🛠️ Prijava problema</h2>
+      <h2>Prijava problema</h2>
       <form className="report-form" onSubmit={handleSubmit}>
         <input
           type="text"

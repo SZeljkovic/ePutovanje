@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 const AdminNavbar = ({ activeSection, handleSectionChange }) => {
   const [openNalozi, setOpenNalozi] = useState(false);
   const [openPonude, setOpenPonude] = useState(false);
+  const [openProblemi, setOpenProblemi] = useState(false);
   const navigate = useNavigate();
-
 
   return (
     <div className="admin-sidebar vh-100 d-flex flex-column p-0" 
@@ -28,7 +28,7 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
               : 'transparent',
             transition: 'all 0.2s ease',
             borderRadius: '0',
-            borderLeft: activeSection === 'profile' ? '3px solid #fff' : '3px solid transparent'
+            borderLeft: activeSection === 'profile' ? '2px solid #fff' : '2px solid transparent'
           }}
           onMouseEnter={(e) => {
             if (activeSection !== 'profile') {
@@ -56,7 +56,7 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
               : 'transparent',
             transition: 'all 0.2s ease',
             borderRadius: '0',
-            borderLeft: activeSection === 'dashboard' ? '3px solid #fff' : '3px solid transparent'
+            borderLeft: activeSection === 'dashboard' ? '2px solid #fff' : '2px solid transparent'
           }}
           onMouseEnter={(e) => {
             if (activeSection !== 'dashboard') {
@@ -118,7 +118,7 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
                       : 'transparent',
                     fontSize: '0.9rem',
                     transition: 'all 0.2s ease',
-                    borderLeft: activeSection === item.key ? '3px solid #fff' : '3px solid transparent',
+                    borderLeft: activeSection === item.key ? '2px solid #fff' : '2px solid transparent',
                     borderRadius: '0'
                   }}
                   onMouseEnter={(e) => {
@@ -180,7 +180,7 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
                       : 'transparent',
                     fontSize: '0.9rem',
                     transition: 'all 0.2s ease',
-                    borderLeft: activeSection === item.key ? '3px solid #fff' : '3px solid transparent',
+                    borderLeft: activeSection === item.key ? '2px solid #fff' : '2px solid transparent',
                     borderRadius: '0'
                   }}
                   onMouseEnter={(e) => {
@@ -202,7 +202,7 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
           </Collapse>
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
           <Nav.Link
             onClick={() => handleSectionChange("destinations")}
             className={`text-white fw-bold px-3 py-2 ${activeSection === 'destinations' ? 'active' : ''}`}
@@ -211,7 +211,7 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
                 ? 'rgba(255,255,255,0.1)' 
                 : 'transparent',
               transition: 'all 0.2s ease',
-              borderLeft: activeSection === 'destinations' ? '3px solid #fff' : '3px solid transparent',
+              borderLeft: activeSection === 'destinations' ? '2px solid #fff' : '2px solid transparent',
               borderRadius: '0'
             }}
             onMouseEnter={(e) => {
@@ -228,63 +228,68 @@ const AdminNavbar = ({ activeSection, handleSectionChange }) => {
             <i className="fas fa-map-marker-alt me-2"></i>
             Destinacije
           </Nav.Link>
-             </div>
+        </div>
 
-           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
+        <div className="mb-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px' }}>
           <Nav.Link
-           onClick={() => navigate("/reportproblem")}
-          className={`text-white fw-bold px-3 py-2 ${activeSection === 'problems' ? 'active' : ''}`}
-           style={{
-          background: activeSection === 'problems' 
-             ? 'rgba(255,255,255,0.1)' 
-             : 'transparent',
-            transition: 'all 0.2s ease',
-            borderLeft: activeSection === 'problems' ? '3px solid #fff' : '3px solid transparent',
-             borderRadius: '0'
+            onClick={() => setOpenProblemi(!openProblemi)}
+            aria-controls="problemi-collapse"
+            aria-expanded={openProblemi}
+            className="text-white fw-bold px-3 py-2"
+            style={{
+              background: 'transparent',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer',
+              borderRadius: '0'
             }}
             onMouseEnter={(e) => {
-          if (activeSection !== 'problems') {
-             e.target.style.background = 'rgba(255,255,255,0.05)';
-           }
-          }}
-          onMouseLeave={(e) => {
-          if (activeSection !== 'problems') {
-           e.target.style.background = 'transparent';
-           }
-             }}
+              e.target.style.background = 'rgba(255,255,255,0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'transparent';
+            }}
           >
-        <i className="fas fa-exclamation-triangle me-2"></i>
-          Prijavi problem
-         </Nav.Link>
-
-
-         <Nav.Link
-  onClick={() => handleSectionChange("problems")}
-  className={`text-white fw-bold px-3 py-2 ${activeSection === 'problems' ? 'active' : ''}`}
-  style={{
-    background: activeSection === 'problems' 
-      ? 'rgba(255,255,255,0.1)' 
-      : 'transparent',
-    transition: 'all 0.2s ease',
-    borderLeft: activeSection === 'problems' ? '3px solid #fff' : '3px solid transparent',
-    borderRadius: '0'
-  }}
-  onMouseEnter={(e) => {
-    if (activeSection !== 'problems') {
-      e.target.style.background = 'rgba(255,255,255,0.05)';
-    }
-  }}
-  onMouseLeave={(e) => {
-    if (activeSection !== 'problems') {
-      e.target.style.background = 'transparent';
-    }
-  }}
->
-  <i className="fas fa-list me-2"></i>
-  Lista problema
-</Nav.Link>
-
-
+            <i className="fas fa-exclamation-triangle me-2"></i>
+            Problemi
+            <i className={`fas fa-chevron-${openProblemi ? 'up' : 'down'} float-end mt-1`}></i>
+          </Nav.Link>
+          
+          <Collapse in={openProblemi}>
+            <div id="problemi-collapse" className="ms-2 mt-2">
+              {[
+                { key: 'report-problem', icon: 'fa-plus', text: 'Prijavi problem', action: () => navigate("/reportproblem") },
+                { key: 'problems', icon: 'fa-list', text: 'Lista problema' }
+              ].map(item => (
+                <Nav.Link 
+                  key={item.key}
+                  onClick={item.action ? item.action : () => handleSectionChange(item.key)} 
+                  className={`text-white px-3 py-2 mb-1 ${activeSection === item.key ? 'active' : ''}`}
+                  style={{
+                    background: activeSection === item.key 
+                      ? 'rgba(255,255,255,0.1)' 
+                      : 'transparent',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s ease',
+                    borderLeft: activeSection === item.key ? '2px solid #fff' : '2px solid transparent',
+                    borderRadius: '0'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeSection !== item.key) {
+                      e.target.style.background = 'rgba(255,255,255,0.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeSection !== item.key) {
+                      e.target.style.background = 'transparent';
+                    }
+                  }}
+                >
+                  <i className={`fas ${item.icon} me-2`}></i>
+                  {item.text}
+                </Nav.Link>
+              ))}
+            </div>
+          </Collapse>
         </div>
 
       </Nav>
