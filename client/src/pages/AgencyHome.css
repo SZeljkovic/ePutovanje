@@ -1,45 +1,52 @@
 .agency-home {
-  background-color: #1e1e1e; /* tamna pozadina */
-  min-height: 100vh;
-  color: white;
-  display: flex;
-  flex-direction: column;
+  background: linear-gradient(135deg, #2a2a2a, #1e1e1e) !important;
+  min-height: 100vh !important;
+  color: #f8f8f8 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  font-family: 'Poppins', sans-serif !important;
 }
 
 .dashboard-container {
-  display: flex;
-  flex: 1;
-  padding: 20px;
-  gap: 20px;
+  display: flex !important;
+  flex: 1 !important;
+  padding: 30px !important;
+  gap: 30px !important;
 }
 
 /* Sidebar */
 .sidebar {
-  width: 220px;
-  background-color: #2c2c2c;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  width: 240px !important;
+  background: rgba(40, 40, 40, 0.6) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 18px !important;
+  padding: 25px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4) !important;
 }
 
 .sidebar button {
-  background-color: transparent;
-  color: white;
-  border: 2px solid #ff9800;
-  border-radius: 8px;
-  padding: 12px;
-  cursor: pointer;
-  transition: 0.3s ease;
-  font-size: 15px;
-  text-align: left;
+  background: transparent !important;
+  color: #f8f8f8 !important;
+  border: 2px solid #7e7e7e  !important; /* zlatna */
+  border-radius: 12px !important;
+  padding: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-size: 15px !important;
+  text-align: left !important;
+  font-weight: 500 !important;
 }
 
 .sidebar button:hover {
-  background-color: #ff9800;
-  color: #1e1e1e;
+  background: #fd760e !important;
+  color: #1a1a1a !important;
+  transform: translateX(6px) !important;
 }
+
 
 /* Content */
 .content {
@@ -51,174 +58,231 @@
 }
 
 /* Forma */
+/* 📝 Forma */
 .agency-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
 }
 
 .agency-form input,
 .agency-form textarea {
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  font-size: 15px;
-  color:#1e1e1e;
+  padding: 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  font-size: 15px !important;
+  background: rgba(40,40,40,0.7) !important;
+  color: #f5f5f5 !important;
+  backdrop-filter: blur(6px) !important;
+  transition: 0.3s ease !important;
+}
+
+.agency-form input::placeholder,
+.agency-form textarea::placeholder {
+  color: #aaa !important;
 }
 
 .agency-form input:focus,
 .agency-form textarea:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #ff9800;
+  outline: none !important;
+  border-color: #fd770e !important;
+  box-shadow: 0 0 10px rgba(253,119,14,0.6) !important;
 }
 
+/* Dugme */
 .agency-form button {
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s ease;
-  font-size: 16px;
+  background: linear-gradient(135deg, #fd770e, #e46600) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 14px !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(253,119,14,0.4) !important;
 }
 
 .agency-form button:hover {
-  background-color: #e68900;
+  background: linear-gradient(135deg, #e46600, #fd770e) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 16px rgba(253,119,14,0.6) !important;
 }
 
-
+/* 📊 Tabela destinacija */
 .dest-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 20px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background: rgba(40,40,40,0.75) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+  color: #f5f5f5 !important;
 }
 
-.dest-table th, .dest-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+.dest-table th, 
+.dest-table td {
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  padding: 12px !important;
+  font-size: 14px !important;
 }
 
 .dest-table th {
-  background-color: #e68900;
-  text-align: left;
+  background: linear-gradient(135deg, #fd770e, #e46600) !important;
+  color: #fff !important;
+  text-align: left !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
 }
 
+.dest-table tr:nth-child(even) {
+  background: rgba(255,255,255,0.05) !important;
+}
+
+.dest-table tr:hover {
+  background: rgba(253,119,14,0.1) !important;
+  transition: 0.3s ease !important;
+}
+/* 📋 Lista zahtjeva */
 .zahtjevi-lista {
-  list-style: none;
-  padding: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .zahtjev-item {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-  transition: background 0.2s;
+  padding: 14px 16px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  background: rgba(35,35,35,0.6) !important;
+  color: #f5f5f5 !important;
 }
 
 .zahtjev-item:hover {
-  background: #333;
-  color: #ff9800;
+  background: rgba(253,119,14,0.1) !important;
+  color: #fd770e !important;
+  padding-left: 20px !important;
 }
 
+/* 📄 Detalji zahtjeva */
 .zahtjev-detalji {
-  background: #2c2c2c;
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
+  background: rgba(40,40,40,0.7) !important;
+  color: #f5f5f5 !important;
+  padding: 24px !important;
+  border-radius: 14px !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
 }
 
 .zahtjev-detalji ul {
-  list-style: none;
-  padding: 0;
+  list-style: none !important;
+  padding: 0 !important;
 }
 
 .zahtjev-detalji li {
-  margin-bottom: 8px;
+  margin-bottom: 10px !important;
+  font-size: 15px !important;
 }
 
+/* 🔘 Akcije */
 .zahtjev-akcije {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
+  margin-top: 20px !important;
+  display: flex !important;
+  gap: 12px !important;
 }
 
+.zahtjev-akcije button {
+  border: none !important;
+  padding: 12px 18px !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+}
+
+/* ✅ Prihvati */
 .btn-accept {
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
+  background: linear-gradient(135deg, #4caf50, #388e3c) !important;
+  color: #fff !important;
 }
-
 .btn-accept:hover {
-  background: #43a047;
+  background: linear-gradient(135deg, #43a047, #2e7d32) !important;
+  transform: scale(1.05) !important;
 }
 
+/* ❌ Odbij */
 .btn-reject {
-  background: #f44336;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
+  background: linear-gradient(135deg, #f44336, #c62828) !important;
+  color: #fff !important;
 }
-
 .btn-reject:hover {
-  background: #d32f2f;
+  background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
+  transform: scale(1.05) !important;
 }
 
+/* 🔙 Nazad */
 .btn-back {
-  background: #777;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
+  background: rgba(255,255,255,0.1) !important;
+  color: #f5f5f5 !important;
 }
-
 .btn-back:hover {
-  background: #555;
+  background: rgba(253,119,14,0.2) !important;
+  color: #fd770e !important;
 }
 
 /* 📦 Lista ponuda */
 .ponude-lista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .ponuda-item {
-  padding: 12px 16px;
-  margin: 6px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  padding: 14px 18px !important;
+  margin: 8px 0 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  background: rgba(30,30,30,0.7) !important;
+  backdrop-filter: blur(8px) !important;
+  transition: all 0.3s ease !important;
+  color: #f1f1f1 !important;
+  font-size: 15px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
 }
 
 .ponuda-item:hover {
-  background: #f5f5f5;
-  transform: translateX(4px);
+  background: rgba(45,45,45,0.9) !important;
+  border-color: #fd770e !important;
+  transform: translateX(6px) !important;
+  box-shadow: 0 4px 14px rgba(253,119,14,0.35) !important;
+  color: #fd770e !important;
 }
 
 
 /* 📝 Detalji ponude */
 .ponuda-detalji {
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 20px;
-  background: #2c2c2c;   /* tamna pozadina */
-  margin-top: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  color: #f1f1f1;        /* svijetli tekst */
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 22px;
+  background: rgba(35,35,35,0.75);
+  margin-top: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  color: #f1f1f1;
+  backdrop-filter: blur(10px);
 }
 
 .ponuda-detalji h3 {
   margin-bottom: 15px;
   font-size: 20px;
-  color: #ff9800;         /* narandžasta za naslov */
+  color: #fd770e;
 }
 
 .ponuda-detalji p {
@@ -228,53 +292,60 @@
 
 /* 🔘 Akcije */
 .ponuda-akcije button {
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
 }
 
-.ponuda-akcije button:nth-child(1) { /* Izmijeni */
-  background: #ff9800;
+/* ✏️ Izmijeni */
+.ponuda-akcije button:nth-child(1) {
+  background: linear-gradient(135deg, #fd770e, #e86c0c);
   color: #fff;
 }
 .ponuda-akcije button:nth-child(1):hover {
-  background: #e68900;
+  transform: scale(1.05);
 }
 
-.ponuda-akcije button:nth-child(2) { /* Obriši */
-  background: #d9534f;
+/* 🗑️ Obriši */
+.ponuda-akcije button:nth-child(2) {
+  background: linear-gradient(135deg, #d9534f, #c9302c);
   color: #fff;
 }
 .ponuda-akcije button:nth-child(2):hover {
-  background: #c9302c;
+  transform: scale(1.05);
 }
 
-.ponuda-akcije button:nth-child(3) { /* Nazad */
-  background: #555;
-  color: #fff;
+/* ⬅️ Nazad */
+.ponuda-akcije button:nth-child(3) {
+  background: rgba(255,255,255,0.1);
+  color: #f1f1f1;
 }
 .ponuda-akcije button:nth-child(3):hover {
-  background: #444;
+  background: rgba(253,119,14,0.2);
+  color: #fd770e;
 }
 
 /* ✏️ Forma za edit */
 .ponuda-edit-form {
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 20px;
-  background: #1e1e1e;   /* još tamnija pozadina */
-  margin-top: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 22px;
+  background: rgba(25,25,25,0.85);
+  margin-top: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.55);
   color: #f1f1f1;
+  backdrop-filter: blur(12px);
 }
 
 .ponuda-edit-form h3 {
   margin-bottom: 15px;
   font-size: 20px;
-  color: #ff9800;
+  color: #fd770e;
 }
 
 .ponuda-edit-form input,
@@ -283,19 +354,20 @@
   width: 100%;
   padding: 10px;
   margin: 6px 0;
-  border: 1px solid #555;
-  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
   font-size: 14px;
-  background: #2c2c2c;
+  background: rgba(40,40,40,0.85);
   color: #f1f1f1;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ponuda-edit-form input:focus,
 .ponuda-edit-form textarea:focus,
 .ponuda-edit-form select:focus {
   outline: none;
-  border-color: #ff9800;
-  box-shadow: 0 0 0 2px #ff9800;
+  border-color: #fd770e;
+  box-shadow: 0 0 0 2px #fd770e;
 }
 
 .ponuda-edit-form label {
@@ -309,36 +381,44 @@
 
 .ponuda-edit-form button {
   margin-top: 10px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
-.ponuda-edit-form button:nth-child(1) { /* Sačuvaj */
-  background: #28a745;
+/* 💾 Sačuvaj */
+.ponuda-edit-form button:nth-child(1) {
+  background: linear-gradient(135deg, #28a745, #218838);
   color: #fff;
 }
 .ponuda-edit-form button:nth-child(1):hover {
-  background: #218838;
+  transform: scale(1.05);
 }
 
-.ponuda-edit-form button:nth-child(2) { /* Nazad */
-  background: #555;
-  color: #fff;
+/* ⬅️ Nazad */
+.ponuda-edit-form button:nth-child(2) {
+  background: rgba(255,255,255,0.1);
+  color: #f5f5f5;
 }
 .ponuda-edit-form button:nth-child(2):hover {
-  background: #444;
+  background: rgba(253,119,14,0.2);
+  color: #fd770e;
 }
 
+/* 👤 Profil detalji */
 .profil-detalji {
-  background-color: #2c2c2c;
-  padding: 20px;
-  border-radius: 12px;
-  color: #fff;
+  background: rgba(35,35,35,0.8);
+  padding: 22px;
+  border-radius: 14px;
+  color: #f5f5f5;
   max-width: 500px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
 }
 
 .profil-detalji ul {
@@ -347,55 +427,65 @@
 }
 
 .profil-detalji li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 
+/* 🔘 Profil akcije */
 .profil-akcije button {
-  background-color: #ff9800;
+  background: linear-gradient(135deg, #fd770e, #e86c0c);
   border: none;
-  padding: 10px 15px;
+  padding: 10px 16px;
   margin-top: 15px;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #fff;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
-
 .profil-akcije button:hover {
-  background-color: #e68900;
+  transform: scale(1.05);
 }
 
+/* 📝 Profil edit forma */
 .profil-edit-form {
-  background-color: #2c2c2c;
-  padding: 20px;
-  border-radius: 12px;
+  background: rgba(35,35,35,0.85);
+  padding: 22px;
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-width: 400px;
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
 }
 
 .profil-edit-form input {
   padding: 10px;
-  border-radius: 6px;
-  border: none;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
   font-size: 15px;
-  color:#1e1e1e;
+  background: rgba(40,40,40,0.85);
+  color: #f1f1f1;
 }
 
 .profil-edit-form input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #ff9800;
+  border-color: #fd770e;
+  box-shadow: 0 0 0 2px #fd770e;
 }
 
 .profil-edit-form button {
-  background-color: #ff9800;
+  background: linear-gradient(135deg, #fd770e, #e86c0c);
   color: white;
-  padding: 10px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
-
 .profil-edit-form button:hover {
-  background-color: #e68900;
+  transform: scale(1.05);
 }
