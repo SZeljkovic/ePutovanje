@@ -17,15 +17,64 @@
   margin-bottom: 20px;
 }
 
+.back-button:hover {
+  text-decoration: underline;
+}
+
+/* Novi stilovi za sliku */
+.offer-image {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.offer-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.offer-image:hover img {
+  transform: scale(1.02);
+}
+
+.offer-image .deal-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 10px rgba(238, 90, 36, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .offer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .offer-header h2 {
   font-size: 28px;
   color: #222;
+  margin: 0;
 }
 
 .price {
@@ -54,6 +103,7 @@
 .offer-description {
   margin: 20px 0;
   line-height: 1.6;
+  font-size: 16px;
 }
 
 .destinations {
@@ -126,10 +176,15 @@
   font-size: 22px;
   cursor: pointer;
   color: #ddd;
+  transition: color 0.2s ease;
 }
 
 .rating-input .star.filled {
   color: #ffc107;
+}
+
+.rating-input .star:hover {
+  color: #ffb300;
 }
 
 textarea {
@@ -138,6 +193,7 @@ textarea {
   border-radius: 6px;
   border: 1px solid #ddd;
   resize: vertical;
+  font-family: inherit;
 }
 
 .submit-review {
@@ -149,17 +205,17 @@ textarea {
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .submit-review:hover {
   background: #45a049;
 }
 
-
 .reservation-section {
   margin: 30px 0;
   padding: 20px;
-  background: #f9f9f9;
+  background-color: #f9f9f9e3;
   border-radius: 10px;
 }
 
@@ -172,6 +228,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background-color: #f9f9f9e3;
 }
 
 .reservation-section label {
@@ -198,7 +255,7 @@ textarea {
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s ease;
 }
 
 .reserve-button:hover {
@@ -222,4 +279,29 @@ textarea {
   font-weight: 600;
 }
 
-
+/* Responsive design */
+@media (max-width: 768px) {
+  .offer-details {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .offer-image {
+    height: 250px;
+  }
+  
+  .offer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .offer-header h2 {
+    font-size: 24px;
+  }
+  
+  .offer-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

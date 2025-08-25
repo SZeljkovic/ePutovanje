@@ -86,7 +86,7 @@ const CompareOffers = () => {
                 {offer.Destinacije.map((d) => d.Naziv).join(", ")}
               </p>
               <p className="text-sm">Cijena: {offer.Cijena} KM</p>
-              <p className="text-sm">Polazak: {offer.DatumPolaska}</p>
+              <p className="text-sm">Polazak: {formatDate(offer.DatumPolaska)}</p>
             </div>
           ))}
         </div>

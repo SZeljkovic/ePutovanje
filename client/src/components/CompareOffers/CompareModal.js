@@ -14,8 +14,7 @@ const CompareModal = ({ isOpen, onClose, children }) => {
             background: "transparent",
             fontSize: "1.5rem",
             cursor: "pointer",
-            color: "white",
-            overflow: "hidden"
+            color: "white"
           }}
           onClick={onClose}
         >

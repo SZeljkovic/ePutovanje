@@ -5,6 +5,28 @@ import "./OfferDetails.css";
 
 const API_BASE = "http://localhost:5000";
 
+// Funkcija za dobijanje slike destinacije (ista kao u UpcomingTrips)
+const getDestinationImage = (destinationName) => {
+  if (!destinationName) {
+    return '/assets/default.jpg';
+  }
+
+  const lowercaseName = destinationName.toLowerCase();
+  const formats = ['.jpg', '.png', '.jpeg', '.webp'];
+
+  for (const format of formats) {
+    try {
+      const imagePath = `/assets/${lowercaseName}${format}`;
+      return imagePath;
+    } catch (err) {
+      continue;
+    }
+  }
+
+  console.error(`Slika za destinaciju "${destinationName}" nije pronađena.`);
+  return '/assets/default.jpg';
+};
+
 const OfferDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -114,24 +136,34 @@ const OfferDetails = () => {
         ← Nazad
       </button>
 
+      {/* Dodana slika destinacije */}
+      <div className="offer-image">
+        <img
+          src={getDestinationImage(offer.Destinacije[0]?.Naziv)}
+          alt={offer.Destinacije[0]?.Naziv || "Destinacija"}
+          onError={(e) => {
+            e.currentTarget.src = '/assets/default.jpg';
+          }}
+        />
+      </div>
+
       <div className="offer-header">
         <h2>{offer.Destinacije[0]?.Naziv}</h2>
         <div className="price">{offer.Cijena.toLocaleString()} BAM</div>
       </div>
 
       <div className="offer-meta">
-      <span>
-        📅 {new Date(offer.DatumPolaska).toLocaleDateString()} -{" "}
-        {new Date(offer.DatumPovratka).toLocaleDateString()}
-      </span>
-      <span>🚌 Prevoz: {offer.TipPrevoza}</span>
-      <span>🎟 Slobodna mjesta: {offer.BrojSlobodnihMjesta}</span>
-      <span>🏢 Agencija: {offer.NazivAgencije + " (" + offer.KorisnickoIme + ") "}</span> {/* DODANO */}
-      {offer.NajatraktivnijaPonuda && (
-        <span className="deal-tag">🔥 Top ponuda</span>
-      )}
-    </div>
-
+        <span>
+          📅 {new Date(offer.DatumPolaska).toLocaleDateString()} -{" "}
+          {new Date(offer.DatumPovratka).toLocaleDateString()}
+        </span>
+        <span>🚌 Prevoz: {offer.TipPrevoza}</span>
+        <span>🎟 Slobodna mjesta: {offer.BrojSlobodnihMjesta}</span>
+        <span>🏢 Agencija: {offer.NazivAgencije + " (" + offer.KorisnickoIme + ") "}</span>
+        {offer.NajatraktivnijaPonuda && (
+          <span className="deal-tag">🔥 Top ponuda</span>
+        )}
+      </div>
 
       <div className="offer-description">
         <p>{offer.Opis}</p>
