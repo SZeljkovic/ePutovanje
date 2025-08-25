@@ -589,16 +589,20 @@ const AdminHome = () => {
                       )}
                       <div className="user-details-row">
                         <div className="user-detail-item">
-                          <strong>Korisničko ime: </strong> {user.KorisnickoIme}
+                          <strong>Korisničko ime: </strong> 
+                          <span className="user-value">{user.KorisnickoIme}</span>
                         </div>
                         <div className="user-detail-item">
-                          <strong>Email: </strong> {user.Email}
+                          <strong>Email: </strong>
+                          <span className="user-value">{user.Email}</span>
                         </div>
                         <div className="user-detail-item">
-                          <strong>Tip: </strong> {getTipKorisnikaText(user.TipKorisnika)}
+                          <strong>Tip: </strong>
+                          <span className="user-value">{getTipKorisnikaText(user.TipKorisnika)}</span>
                         </div>
                         <div className="user-detail-item">
-                          <strong>Status: </strong> {getStatusText(user.StatusNaloga)}
+                          <strong>Status: </strong> 
+                          <span className="user-value">{getStatusText(user.StatusNaloga)}</span>
                         </div>
                       </div>
                     </div>
@@ -637,11 +641,14 @@ const AdminHome = () => {
                 {suspendedUsers.map(user => (
                   <div key={user.idKORISNIK} className="user-card">
                     <div className="user-info">
-                      <h4>{user.Ime} {user.Prezime}</h4>
-                      <p><strong>Korisničko ime:</strong> {user.KorisnickoIme}</p>
-                      <p><strong>Email:</strong> {user.Email}</p>
-                      <p><strong>Tip:</strong> {getTipKorisnikaText(user.TipKorisnika)}</p>
-                      {user.NazivAgencije && <p><strong>Agencija:</strong> {user.NazivAgencije}</p>}
+                      {user.NazivAgencije ? (
+                        <h4>{user.NazivAgencije}</h4>
+                      ) : (
+                        <h4>{user.Ime} {user.Prezime}</h4>
+                      )}
+                      <p><strong>Korisničko ime:</strong>  <span className="user-value">{user.KorisnickoIme}</span> </p>
+                      <p><strong>Email:</strong>  <span className="user-value">{user.Email}</span></p>
+                      <p><strong>Tip:</strong>  <span className="user-value">{getTipKorisnikaText(user.TipKorisnika)}</span></p>
                     </div>
                     <div className="user-actions">
                       <button

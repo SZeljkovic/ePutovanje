@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import logo from "../../assets/logo3.png";
-import chatIcon from "../../assets/chat.png"; 
-import bellIcon from "../../assets/bell.png"; 
+import chatIcon from "../../assets/chat2.png"; 
+import bellIcon from "../../assets/bell2.png"; 
 import "./Header.css";
 import { AuthContext } from "../../context/AuthContext";
 

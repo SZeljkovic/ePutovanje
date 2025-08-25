@@ -75,7 +75,7 @@
 }
 
 .logout-btn-header {
-  background-color: #ff9800 !important; /* osnovna narandžasta */
+  /*background-color: #ff9800 !important; /* osnovna narandžasta */
   color: #fff;
   font-weight: 600;
   border: none;
@@ -87,7 +87,7 @@
 }
 
 .logout-btn-header:hover {
-  background-color: #ffbc59 !important; 
+  /*background-color: #ffbc59 !important; */
   transform: translateY(-2px); 
   box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
