@@ -504,7 +504,7 @@ app.post('/forgot-password', async (req, res) => {
         const korisnik = rows[0];
 
         // Generiši novu privremenu lozinku
-        const novaLozinka = crypto.randomBytes(6).toString('hex'); // npr. 12 karaktera
+        const novaLozinka = crypto.randomBytes(6).toString('hex'); 
         const hashedLozinka = await bcrypt.hash(novaLozinka, 10);
 
         // Ažuriraj lozinku u bazi
@@ -515,27 +515,27 @@ app.post('/forgot-password', async (req, res) => {
 
         // Pošalji mejl sa novom lozinkom
         const transporter = nodemailer.createTransport({
-            host: "live.smtp.mailtrap.io",
+            host: "smtp.ethereal.email",
             port: 587,
             secure: false,
             auth: {
-                user: "api",
-                pass: "a2a56baeace0bb97be50120d4be74573",
+                user: 'benjamin.hackett@ethereal.email',
+                pass: 'rYQrUD6ukcAx93PJNN',
             },
             tls: {
                 rejectUnauthorized: false
             }
         });
 
-        /*const info = await transporter.sendMail({
+        const info = await transporter.sendMail({
             from: '"ePutovanje" <eputovanje@gmail.com>',
             to: korisnik.Email,
             subject: "Privremena lozinka",
             text: `Vaša nova privremena lozinka je: ${novaLozinka}`,
             html: `<p>Poštovani,</p><p>Vaša nova privremena lozinka je: <b>${novaLozinka}</b></p><p>Preporučujemo da je odmah promijenite nakon prijave.</p>`,
-        });*/
+        });
 
-        //console.log("Mejl poslat:", info.messageId);
+        console.log("Mejl poslat:", info.messageId);
 
         // Vrati korisniku novu lozinku u odgovoru (za testiranje)
         res.status(200).json({
