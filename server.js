@@ -504,7 +504,7 @@ app.post('/forgot-password', async (req, res) => {
         const korisnik = rows[0];
 
         // Generiši novu privremenu lozinku
-        const novaLozinka = crypto.randomBytes(6).toString('hex'); 
+        const novaLozinka = crypto.randomBytes(6).toString('hex');
         const hashedLozinka = await bcrypt.hash(novaLozinka, 10);
 
         // Ažuriraj lozinku u bazi
@@ -599,7 +599,9 @@ app.get('/all-profiles', authenticateToken, authenticateAdmin, async (req, res) 
                 Email
             FROM korisnik
             WHERE StatusNaloga = 1
+            ORDER BY TipKorisnika ASC
         `;
+
 
         const [rows] = await db.promise().query(query);
 
@@ -1042,7 +1044,7 @@ app.get('/ponuda/:id', async (req, res) => {
             NajatraktivnijaPonuda: !!rows[0].NajatraktivnijaPonuda,
             idKORISNIK: rows[0].idKORISNIK,
             NazivAgencije: rows[0].NazivAgencije,
-            KorisnickoIme: rows[0].KorisnickoIme, 
+            KorisnickoIme: rows[0].KorisnickoIme,
             Destinacije: []
         };
 
@@ -1154,12 +1156,48 @@ app.delete('/destinacija/:id', authenticateToken, authenticateAdmin, async (req,
 //pregled svojih ponuda - agencija 
 app.get('/ponude/moje', authenticateToken, authenticateAgency, async (req, res) => {
     try {
-        const idAgencije = req.user.idKORISNIK; // direktno iz tokena
-
-        console.log("ID agencije koja šalje zahtjev:", idAgencije);
+        const idAgencije = req.user.idKORISNIK;
 
         const [ponude] = await db.promise().query(`
-            SELECT * FROM ponuda WHERE idKorisnik = ?
+            SELECT * FROM ponuda WHERE idKorisnik = ? ORDER BY idPONUDA DESC
+        `, [idAgencije]);
+
+        return res.json(ponude);
+
+    } catch (err) {
+        console.error("Greška pri dohvatu ponuda:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+app.get('/ponude/moje-odobrene', authenticateToken, authenticateAgency, async (req, res) => {
+    try {
+        const idAgencije = req.user.idKORISNIK;
+
+        const [ponude] = await db.promise().query(`
+            SELECT *
+            FROM ponuda 
+            WHERE idKorisnik = ? AND StatusPonude = 1 
+            ORDER BY idPONUDA DESC
+        `, [idAgencije]);
+
+        return res.json(ponude);
+
+    } catch (err) {
+        console.error("Greška pri dohvatu ponuda:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
+});
+
+app.get('/ponude/moje-neodobrene', authenticateToken, authenticateAgency, async (req, res) => {
+    try {
+        const idAgencije = req.user.idKORISNIK;
+
+        const [ponude] = await db.promise().query(`
+            SELECT *
+            FROM ponuda 
+            WHERE idKorisnik = ? AND StatusPonude = 0 
+            ORDER BY idPONUDA DESC
         `, [idAgencije]);
 
         return res.json(ponude);

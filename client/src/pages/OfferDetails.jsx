@@ -112,7 +112,7 @@ const OfferDetails = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setReservationMessage(
-        `✅ ${res.data.message}. Ukupna cijena: ${res.data.ukupnaCijena} €`
+        `✅ ${res.data.message}. Ukupna cijena: ${res.data.ukupnaCijena} BAM`
       );
     } catch (err) {
       console.error("Greška pri rezervaciji:", err);
