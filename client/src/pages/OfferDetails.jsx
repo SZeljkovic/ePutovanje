@@ -42,6 +42,16 @@ const OfferDetails = () => {
   });
   const [reservationMessage, setReservationMessage] = useState("");
 
+  const [fullscreenImage, setFullscreenImage] = useState(null);
+
+  const openFullscreen = (src) => {
+    setFullscreenImage(src);
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenImage(null);
+  };
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -136,16 +146,26 @@ const OfferDetails = () => {
         ← Nazad
       </button>
 
-      {/* Dodana slika destinacije */}
       <div className="offer-image">
-        <img
-          src={getDestinationImage(offer.Destinacije[0]?.Naziv)}
-          alt={offer.Destinacije[0]?.Naziv || "Destinacija"}
-          onError={(e) => {
-            e.currentTarget.src = '/assets/default.jpg';
-          }}
-        />
-      </div>
+  <img
+    src={getDestinationImage(offer.Destinacije[0]?.Naziv)}
+    alt={offer.Destinacije[0]?.Naziv || "Destinacija"}
+    onError={(e) => {
+      e.currentTarget.src = '/assets/default.jpg'; // Samo fallback
+    }}
+    onClick={(e) => openFullscreen(e.currentTarget.src)} // Klik uvijek otvara ono što se vidi
+    style={{ cursor: "pointer" }}
+  />
+</div>
+
+
+      {/* Modal za fullscreen prikaz slike */}
+      {fullscreenImage && (
+        <div className="fullscreen-overlay" onClick={closeFullscreen}>
+          <img src={fullscreenImage} alt="Fullscreen" className="fullscreen-img" />
+          <span className="close-btn" onClick={closeFullscreen}>×</span>
+        </div>
+      )}
 
       <div className="offer-header">
         <h2>{offer.Destinacije[0]?.Naziv}</h2>

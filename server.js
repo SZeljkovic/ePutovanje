@@ -1456,7 +1456,7 @@ app.get('/sve-rezervacije', authenticateToken, authenticateAgency, async (req, r
         `, [idAgencije]);
 
         if (rezervacije.length === 0) {
-            return res.status(404).json({ error: "Nema prihvaćenih rezervacija za ovu agenciju." });
+            return res.json([]);
         }
 
         res.json(rezervacije);
@@ -2202,6 +2202,37 @@ app.get('/obavjestenja', authenticateToken, async (req, res) => {
         console.error("Greška pri dohvatanju obavještenja:", err);
         res.status(500).json({ error: "Greška na serveru" });
     }
+});
+
+
+// Sve rezervacije za jednu ponudu
+app.get('/ponude/:id/rezervacije', authenticateToken, authenticateAgency, async (req, res) => {
+  const { id } = req.params;
+  const idAgencije = req.user.idKORISNIK;
+
+  try {
+    const [rezervacije] = await db.promise().query(`
+      SELECT 
+        r.idREZERVACIJA,
+        r.Datum,
+        r.BrojOdraslih,
+        r.BrojDjece,
+        r.StatusRezervacije,
+        k.Ime AS ImeKorisnika,
+        k.Prezime AS PrezimeKorisnika,
+        k.Email,
+        p.Opis AS NazivPonude
+      FROM rezervacija r
+      JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
+      JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+      WHERE r.idPONUDA = ? AND p.idKORISNIK = ?
+    `, [id, idAgencije]);
+
+    res.json(rezervacije);
+  } catch (err) {
+    console.error("Greška pri dohvatanju rezervacija za ponudu:", err);
+    res.status(500).json({ error: "Greška na serveru." });
+  }
 });
 
 
