@@ -617,3 +617,25 @@
   }
 }
 
+.rezervacije-ponude {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  background: rgba(40, 40, 40, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.rezervacije-ponude h4 {
+  color: #fd770e;
+  margin-bottom: 12px;
+}
+
+.rezervacije-ponude .zahtjev-item {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(30, 30, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

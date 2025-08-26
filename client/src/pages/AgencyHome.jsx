@@ -29,6 +29,9 @@ const AgencyHome = () => {
   const [profilKorisnika, setProfilKorisnika] = useState(null);
   const [odbijeneRezervacije, setOdbijeneRezervacije] = useState([]);
   const [profilForm, setProfilForm] = useState({});
+  const [rezervacijePonude, setRezervacijePonude] = useState([]);
+  const [prikaziRezervacijePonude, setPrikaziRezervacijePonude] = useState(false);
+
 
 
   const navigate = useNavigate();
@@ -81,6 +84,20 @@ const AgencyHome = () => {
       setLoading(false);
     }
   };
+
+  const fetchRezervacijePonude = async (idPonude) => {
+  try {
+    const res = await axios.get(`${API_BASE}/ponude/${idPonude}/rezervacije`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setRezervacijePonude(res.data);
+    setPrikaziRezervacijePonude(true);
+  } catch (err) {
+    console.error("Greška pri dohvatanju rezervacija ponude:", err);
+    alert("Greška pri dohvatanju rezervacija.");
+  }
+};
+
 
   // Dohvati sve prihvaćene rezervacije
   const fetchRezervacije = async () => {
@@ -607,8 +624,30 @@ const AgencyHome = () => {
                   <div className="ponuda-akcije">
                     <button onClick={() => setEditMode(true)}>✏️ Izmijeni</button>
                     <button onClick={handleDeletePonuda}>🗑️ Obriši</button>
+                    <button onClick={() => fetchRezervacijePonude(odabranaPonuda.idPONUDA)}>📑 Rezervacije</button>
                     <button onClick={() => setOdabranaPonuda(null)}>⬅ Nazad</button>
                   </div>
+
+                                {prikaziRezervacijePonude && (
+                  <div className="rezervacije-ponude">
+                    <h4>📋 Rezervacije za ovu ponudu</h4>
+                    {rezervacijePonude.length === 0 ? (
+                      <p>Nema rezervacija za ovu ponudu.</p>
+                    ) : (
+                      <ul className="zahtjevi-lista">
+                        {rezervacijePonude.map((r) => (
+                          <li key={r.idREZERVACIJA} className="zahtjev-item">
+                            {r.ImeKorisnika} {r.PrezimeKorisnika} - {r.Email} <br />
+                            {r.BrojOdraslih} odraslih, {r.BrojDjece} djece | 
+                            Datum: {new Date(r.Datum).toLocaleDateString()}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <button className="btn-back" onClick={() => setPrikaziRezervacijePonude(false)}>⬅ Sakrij</button>
+                  </div>
+                )}
+
                 </div>
               )
             ) : (
