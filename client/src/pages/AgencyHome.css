@@ -14,7 +14,6 @@
   gap: 30px !important;
 }
 
-/* Sidebar */
 .sidebar {
   width: 240px !important;
   background: rgba(40, 40, 40, 0.6) !important;
@@ -25,13 +24,13 @@
   display: flex !important;
   flex-direction: column !important;
   gap: 18px !important;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
 }
 
 .sidebar button {
   background: transparent !important;
   color: #f8f8f8 !important;
-  border: 2px solid #7e7e7e  !important; /* zlatna */
+  border: 2px solid #7e7e7e !important;
   border-radius: 12px !important;
   padding: 14px !important;
   cursor: pointer !important;
@@ -42,35 +41,32 @@
 }
 
 .sidebar button:hover {
-  background: #fd760e !important;
+  background: #45423f !important;
   color: #1a1a1a !important;
   transform: translateX(6px) !important;
 }
 
 
-/* Content */
 .content {
   flex: 1;
   background-color: #2c2c2c;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 
-h2 {
-  font-size: 1.25rem !important;
-  font-weight: 600 !important; 
-  margin-bottom: 1.5rem !important; 
-  margin-top: 0 !important;
-  line-height: 1.4 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
+.agency-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-/* Forma */
-/* 📝 Forma */
 .agency-form {
   display: flex !important;
   flex-direction: column !important;
@@ -81,9 +77,9 @@ h2 {
 .agency-form textarea {
   padding: 14px !important;
   border-radius: 10px !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   font-size: 15px !important;
-  background: rgba(40,40,40,0.7) !important;
+  background: rgba(40, 40, 40, 0.7) !important;
   color: #f5f5f5 !important;
   backdrop-filter: blur(6px) !important;
   transition: 0.3s ease !important;
@@ -97,11 +93,26 @@ h2 {
 .agency-form input:focus,
 .agency-form textarea:focus {
   outline: none !important;
-  border-color: #fd770e !important;
-  box-shadow: 0 0 10px rgba(253,119,14,0.6) !important;
 }
 
-/* Dugme */
+.agency-form select {
+  padding: 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-size: 15px !important;
+  background: rgba(40, 40, 40, 0.9) !important; 
+  color: #f5f5f5 !important;
+  backdrop-filter: blur(6px) !important;
+  transition: 0.3s ease !important;
+  height: 55px !important; 
+  appearance: none !important; 
+  cursor: pointer !important;
+}
+
+.agency-form select:hover {
+  border-color: rgba(27, 24, 23, 0.5) !important;
+}
+
 .agency-form button {
   background: linear-gradient(135deg, #fd770e, #e46600) !important;
   color: #fff !important;
@@ -113,31 +124,30 @@ h2 {
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
   transition: 0.3s ease !important;
-  box-shadow: 0 4px 12px rgba(253,119,14,0.4) !important;
+  box-shadow: 0 4px 12px rgba(253, 119, 14, 0.4) !important;
 }
 
 .agency-form button:hover {
   background: linear-gradient(135deg, #e46600, #fd770e) !important;
   transform: scale(1.05) !important;
-  box-shadow: 0 6px 16px rgba(253,119,14,0.6) !important;
+  box-shadow: 0 6px 16px rgba(253, 119, 14, 0.6) !important;
 }
 
-/* 📊 Tabela destinacija */
 .dest-table {
   width: 100% !important;
   border-collapse: collapse !important;
   margin-top: 20px !important;
   border-radius: 12px !important;
   overflow: hidden !important;
-  background: rgba(40,40,40,0.75) !important;
+  background: rgba(40, 40, 40, 0.75) !important;
   backdrop-filter: blur(6px) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   color: #f5f5f5 !important;
 }
 
-.dest-table th, 
+.dest-table th,
 .dest-table td {
-  border: 1px solid rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   padding: 12px !important;
   font-size: 14px !important;
 }
@@ -151,14 +161,14 @@ h2 {
 }
 
 .dest-table tr:nth-child(even) {
-  background: rgba(255,255,255,0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .dest-table tr:hover {
-  background: rgba(253,119,14,0.1) !important;
+  background: rgba(253, 119, 14, 0.1) !important;
   transition: 0.3s ease !important;
 }
-/* 📋 Lista zahtjeva */
+
 .zahtjevi-lista {
   list-style: none !important;
   padding: 0 !important;
@@ -167,28 +177,27 @@ h2 {
 
 .zahtjev-item {
   padding: 14px 16px !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   cursor: pointer !important;
   transition: all 0.3s ease !important;
-  background: rgba(35,35,35,0.6) !important;
+  background: rgba(35, 35, 35, 0.6) !important;
   color: #f5f5f5 !important;
 }
 
 .zahtjev-item:hover {
-  background: rgba(253,119,14,0.1) !important;
+  background: rgba(253, 119, 14, 0.1) !important;
   color: #fd770e !important;
   padding-left: 20px !important;
 }
 
-/* 📄 Detalji zahtjeva */
 .zahtjev-detalji {
-  background: rgba(40,40,40,0.7) !important;
+  background: rgba(40, 40, 40, 0.7) !important;
   color: #f5f5f5 !important;
   padding: 24px !important;
   border-radius: 14px !important;
   backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .zahtjev-detalji ul {
@@ -201,7 +210,6 @@ h2 {
   font-size: 15px !important;
 }
 
-/* 🔘 Akcije */
 .zahtjev-akcije {
   margin-top: 20px !important;
   display: flex !important;
@@ -216,40 +224,49 @@ h2 {
   font-size: 15px !important;
   font-weight: 500 !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* ✅ Prihvati */
 .btn-accept {
   background: linear-gradient(135deg, #4caf50, #388e3c) !important;
   color: #fff !important;
 }
+
 .btn-accept:hover {
   background: linear-gradient(135deg, #43a047, #2e7d32) !important;
   transform: scale(1.05) !important;
 }
 
-/* ❌ Odbij */
 .btn-reject {
   background: linear-gradient(135deg, #f44336, #c62828) !important;
   color: #fff !important;
 }
+
 .btn-reject:hover {
   background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
   transform: scale(1.05) !important;
 }
 
-/* 🔙 Nazad */
+.btn-accept,
+.btn-reject,
 .btn-back {
-  background: rgba(255,255,255,0.1) !important;
+  padding: 4px 10px !important; 
+  font-size: 0.85rem !important;  
+  border-radius: 6px !important;  
+  height: auto !important;        
+  line-height: 1.5 !important;    
+}
+
+.btn-back {
+  background: rgba(255, 255, 255, 0.1) !important;
   color: #f5f5f5 !important;
 }
+
 .btn-back:hover {
-  background: rgba(253,119,14,0.2) !important;
+  background: rgba(253, 119, 14, 0.2) !important;
   color: #fd770e !important;
 }
 
-/* 📦 Lista ponuda */
 .ponude-lista {
   list-style: none !important;
   padding: 0 !important;
@@ -259,34 +276,33 @@ h2 {
 .ponuda-item {
   padding: 14px 18px !important;
   margin: 8px 0 !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
   cursor: pointer !important;
-  background: rgba(30,30,30,0.7) !important;
+  background: rgba(30, 30, 30, 0.7) !important;
   backdrop-filter: blur(8px) !important;
   transition: all 0.3s ease !important;
   color: #f1f1f1 !important;
   font-size: 15px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 .ponuda-item:hover {
-  background: rgba(45,45,45,0.9) !important;
+  background: rgba(45, 45, 45, 0.9) !important;
   border-color: #fd770e !important;
   transform: translateX(6px) !important;
-  box-shadow: 0 4px 14px rgba(253,119,14,0.35) !important;
+  box-shadow: 0 4px 14px rgba(253, 119, 14, 0.35) !important;
   color: #fd770e !important;
 }
 
 
-/* 📝 Detalji ponude */
 .ponuda-detalji {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 22px;
-  background: rgba(35,35,35,0.75);
+  background: rgba(35, 35, 35, 0.75);
   margin-top: 18px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
   color: #f1f1f1;
   backdrop-filter: blur(10px);
 }
@@ -302,7 +318,6 @@ h2 {
   font-size: 15px;
 }
 
-/* 🔘 Akcije */
 .ponuda-akcije button {
   padding: 10px 18px;
   border: none;
@@ -311,45 +326,44 @@ h2 {
   font-size: 14px;
   transition: all 0.3s ease;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
-/* ✏️ Izmijeni */
 .ponuda-akcije button:nth-child(1) {
   background: linear-gradient(135deg, #fd770e, #e86c0c);
   color: #fff;
 }
+
 .ponuda-akcije button:nth-child(1):hover {
   transform: scale(1.05);
 }
 
-/* 🗑️ Obriši */
 .ponuda-akcije button:nth-child(2) {
   background: linear-gradient(135deg, #d9534f, #c9302c);
   color: #fff;
 }
+
 .ponuda-akcije button:nth-child(2):hover {
   transform: scale(1.05);
 }
 
-/* ⬅️ Nazad */
 .ponuda-akcije button:nth-child(3) {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: #f1f1f1;
 }
+
 .ponuda-akcije button:nth-child(3):hover {
-  background: rgba(253,119,14,0.2);
+  background: rgba(253, 119, 14, 0.2);
   color: #fd770e;
 }
 
-/* ✏️ Forma za edit */
 .ponuda-edit-form {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 22px;
-  background: rgba(25,25,25,0.85);
+  background: rgba(25, 25, 25, 0.85);
   margin-top: 18px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
   color: #f1f1f1;
   backdrop-filter: blur(12px);
 }
@@ -366,10 +380,10 @@ h2 {
   width: 100%;
   padding: 10px;
   margin: 6px 0;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   font-size: 14px;
-  background: rgba(40,40,40,0.85);
+  background: rgba(40, 40, 40, 0.85);
   color: #f1f1f1;
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
@@ -402,35 +416,34 @@ h2 {
   font-weight: 500;
 }
 
-/* 💾 Sačuvaj */
 .ponuda-edit-form button:nth-child(1) {
   background: linear-gradient(135deg, #28a745, #218838);
   color: #fff;
 }
+
 .ponuda-edit-form button:nth-child(1):hover {
   transform: scale(1.05);
 }
 
-/* ⬅️ Nazad */
 .ponuda-edit-form button:nth-child(2) {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: #f5f5f5;
 }
+
 .ponuda-edit-form button:nth-child(2):hover {
-  background: rgba(253,119,14,0.2);
+  background: rgba(253, 119, 14, 0.2);
   color: #fd770e;
 }
 
-/* 👤 Profil detalji */
 .profil-detalji {
-  background: rgba(35,35,35,0.8);
+  background: rgba(35, 35, 35, 0.8);
   padding: 22px;
   border-radius: 14px;
   color: #f5f5f5;
   max-width: 500px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
 .profil-detalji ul {
@@ -443,7 +456,6 @@ h2 {
   font-size: 15px;
 }
 
-/* 🔘 Profil akcije */
 .profil-akcije button {
   background: linear-gradient(135deg, #fd770e, #e86c0c);
   border: none;
@@ -455,30 +467,30 @@ h2 {
   transition: all 0.3s ease;
   font-weight: 500;
 }
+
 .profil-akcije button:hover {
   transform: scale(1.05);
 }
 
-/* 📝 Profil edit forma */
 .profil-edit-form {
-  background: rgba(35,35,35,0.85);
+  background: rgba(35, 35, 35, 0.85);
   padding: 22px;
   border-radius: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-width: 400px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
 .profil-edit-form input {
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   font-size: 15px;
-  background: rgba(40,40,40,0.85);
+  background: rgba(40, 40, 40, 0.85);
   color: #f1f1f1;
 }
 
@@ -498,6 +510,110 @@ h2 {
   transition: all 0.3s ease;
   font-weight: 500;
 }
+
 .profil-edit-form button:hover {
   transform: scale(1.05);
 }
+
+.dashboard-overview {
+  padding: 0;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin: 30px 0;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #2c2c2c 0%, #3a3a3a 100%) !important;
+  padding: 30px !important;
+  border-radius: 15px !important;
+  text-align: center !important;
+  border: 2px solid transparent !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  color: #f8f8f8 !important;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 8px 25px rgba(253, 119, 14, 0.2) !important;
+}
+
+.stat-number {
+  font-size: 2.5rem !important;
+  font-weight: bold !important;
+  color: #ff9800 !important;
+  margin-bottom: 10px !important;
+}
+
+.stat-label {
+  margin: 10px 0 15px 0 !important;
+  color: #f8f8f8 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+.stat-button {
+  background: linear-gradient(135deg, #524c48, #34302d) !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.stat-button:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 16px rgba(78, 74, 71, 0.6) !important;
+}
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+  }
+  
+  .stat-card {
+    padding: 25px !important;
+  }
+  
+  .stat-number {
+    font-size: 2rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .action-buttons {
+    flex-direction: column !important;
+  }
+  
+  .stat-card {
+    padding: 20px !important;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem !important;
+  }
+}
+

@@ -77,7 +77,6 @@ const AdminHome = () => {
     setSuccess("");
   };
 
-
   useEffect(() => {
     if (!token || !user) {
       navigate("/login");
@@ -438,11 +437,6 @@ const AdminHome = () => {
 
   return (
     <div className="admin-page">
-      {/*<Header
-      setActiveSection={setActiveSection}
-      logout={logout}
-      navigate={navigate}
-    />*/}
 
       <AdminNavbar
         activeSection={activeSection}
