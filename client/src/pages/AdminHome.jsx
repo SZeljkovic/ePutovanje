@@ -683,8 +683,8 @@ const AdminHome = () => {
                   <div key={request.idKORISNIK} className="user-card">
                     <div className="user-info">
                       <h4>{request.NazivAgencije}</h4>
-                      <p><strong>Korisničko ime:</strong> {request.KorisnickoIme}</p>
-                      <p><strong>Email:</strong> {request.Email}</p>
+                      <p><strong>Korisničko ime:</strong> <span className="user-value">{request.KorisnickoIme}</span></p>
+                      <p><strong>Email:</strong> <span className="user-value">{request.Email}</span></p>
                     </div>
                     <div className="user-actions">
                       <button

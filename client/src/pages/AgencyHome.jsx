@@ -4,7 +4,7 @@ import Header from "../components/Header/Header";
 import axios from "axios";
 import "./AgencyHome.css";
 
-const API_BASE = "http://localhost:5000"; // prilagodi port ako je drugi
+const API_BASE = "http://localhost:5000"; 
 
 const AgencyHome = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -300,6 +300,7 @@ const handleDeletePonuda = async () => {
       alert("Greška pri kreiranju ponude.");
     }
   };
+  
 
   const renderContent = () => {
     if (loading) return <p>⏳ Učitavanje...</p>;
@@ -316,7 +317,7 @@ const handleDeletePonuda = async () => {
             <li><b>Korisnik:</b> {odabraniZahtjev.ImeKorisnika} {odabraniZahtjev.PrezimeKorisnika}</li>
             <li><b>Email:</b> {odabraniZahtjev.Email}</li>
             <li><b>Ponuda:</b> {odabraniZahtjev.NazivPonude}</li>
-            <li><b>Cijena po osobi:</b> {odabraniZahtjev.CijenaPoOsobi} €</li>
+            <li><b>Cijena po osobi:</b> {odabraniZahtjev.CijenaPoOsobi} BAM</li>
             <li><b>Datum:</b> {new Date(odabraniZahtjev.Datum).toLocaleDateString()}</li>
             <li><b>Broj odraslih:</b> {odabraniZahtjev.BrojOdraslih}</li>
             <li><b>Broj djece:</b> {odabraniZahtjev.BrojDjece}</li>
@@ -363,7 +364,7 @@ const handleDeletePonuda = async () => {
           <div>
             <h2>➕ Kreiraj novu ponudu</h2>
             <form className="agency-form" onSubmit={handleCreatePonuda}>
-              <input type="number" name="cijena" placeholder="Cijena (€)" required />
+              <input type="number" name="cijena" placeholder="Cijena (BAM)" required />
               <textarea name="opis" placeholder="Opis ponude" />
               <input type="date" name="datumPolaska" required />
               <input type="date" name="datumPovratka" required />
@@ -408,7 +409,7 @@ const handleDeletePonuda = async () => {
               <li><b>Djece:</b> {odabranaRezervacija.BrojDjece}</li>
               <li><b>Status:</b> {odabranaRezervacija.StatusRezervacije}</li>
               <li><b>Ponuda:</b> {odabranaRezervacija.NazivPonude}</li>
-              <li><b>Cijena po osobi:</b> {odabranaRezervacija.CijenaPoOsobi} €</li>
+              <li><b>Cijena po osobi:</b> {odabranaRezervacija.CijenaPoOsobi} BAM</li>
               <li><b>Korisnik:</b> {odabranaRezervacija.ImeKorisnika} {odabranaRezervacija.PrezimeKorisnika}</li>
             </ul>
 
@@ -513,7 +514,7 @@ const handleDeletePonuda = async () => {
         ) : (
           <div className="ponuda-detalji">
             <h3>{odabranaPonuda.Opis}</h3>
-            <p><b>Cijena:</b> {odabranaPonuda.Cijena} €</p>
+            <p><b>Cijena:</b> {odabranaPonuda.Cijena} BAM</p>
             <p><b>Destinacija:</b> {odabranaPonuda.NazivDestinacije}</p>
             <p><b>Opis destinacije:</b> {odabranaPonuda.Opis}</p>
             <p><b>Tip:</b> {odabranaPonuda.Tip}</p>
