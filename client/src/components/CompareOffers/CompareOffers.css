@@ -44,14 +44,12 @@
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  /*overflow-x: auto;*/
-  flex: 1; 
-  max-height: 500px; 
-  overflow: hidden; 
-  position: sticky;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid #ccc;
-  top: 0;
 }
+
 
 .comparison-table {
   width: 100%;
