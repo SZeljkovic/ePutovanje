@@ -564,9 +564,18 @@ app.delete('/delete-profile/:id', authenticateToken, authenticateAdmin, async (r
 
     } catch (err) {
         console.error("Greška pri brisanju korisnika:", err);
+
+        // Ako je foreign key constraint (errno 1451)
+        if (err.code === "ER_ROW_IS_REFERENCED_2") {
+            return res.status(400).json({ 
+                error: "Nije moguće obrisati nalog koji ima vezane ponude ili obavještenja." 
+            });
+        }
+
         res.status(500).json({ error: "Greška na serveru prilikom brisanja korisnika." });
     }
 });
+
 
 // pregled svih profila (samo za administratore)
 app.get('/all-profiles', authenticateToken, authenticateAdmin, async (req, res) => {
@@ -1055,11 +1064,25 @@ app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAgency, async (r
     const idPONUDA = req.params.id;
 
     try {
+        // prvo provjeri da li postoje rezervacije za tu ponudu
+        const [rezervacije] = await db.promise().query(
+            "SELECT 1 FROM rezervacija WHERE idPONUDA = ? LIMIT 1",
+            [idPONUDA]
+        );
+
+        if (rezervacije.length > 0) {
+            return res.status(400).json({
+                error: "Nije moguće obrisati ponudu jer klijenti imaju vezane rezervacije."
+            });
+        }
+
+        // ako nema rezervacija, briši vezu sa destinacijom
         await db.promise().query(
             "DELETE FROM ponuda_has_destinacija WHERE idPONUDA = ?",
             [idPONUDA]
         );
 
+        // pa briši ponudu
         const [result] = await db.promise().query(
             "DELETE FROM ponuda WHERE idPONUDA = ?",
             [idPONUDA]
@@ -1076,6 +1099,8 @@ app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAgency, async (r
         res.status(500).json({ error: "Greška na serveru prilikom brisanja ponude." });
     }
 });
+
+
 
 app.get('/destinacije', authenticateToken, async (req, res) => {
     try {

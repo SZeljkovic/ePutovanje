@@ -323,21 +323,24 @@ const AgencyHome = () => {
   };
 
   const handleDeletePonuda = async () => {
-    if (!window.confirm("Da li ste sigurni da želite obrisati ovu ponudu?")) return;
-    try {
-      const res = await axios.delete(
-        `${API_BASE}/obrisi-ponudu/${odabranaPonuda.idPONUDA}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert(res.data.message);
-      setOdabranaPonuda(null);
-      fetchPonudeOdobrene();
-      fetchPonudeNeodobrene();
-    } catch (err) {
-      console.error("Greška brisanje:", err);
-      alert("Greška pri brisanju ponude.");
-    }
-  };
+  if (!window.confirm("Da li ste sigurni da želite obrisati ovu ponudu?")) return;
+
+  try {
+    const res = await axios.delete(
+      `${API_BASE}/obrisi-ponudu/${odabranaPonuda.idPONUDA}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert(res.data.message);
+    setOdabranaPonuda(null);
+    fetchPonudeOdobrene();
+    fetchPonudeNeodobrene();
+  } catch (err) {
+    console.error("Greška brisanje:", err);
+    const poruka = err.response?.data?.error || "Greška pri brisanju ponude.";
+    alert(poruka);
+  }
+};
+
 
   // Kreiranje nove ponude
   const handleCreatePonuda = async (e) => {
