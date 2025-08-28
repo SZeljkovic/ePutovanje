@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './UpcomingTrips.css';
@@ -15,7 +15,7 @@ const getDestinationImage = (destinationName) => {
   for (const format of formats) {
     try {
       const imagePath = `/assets/${lowercaseName}${format}`;
-    return imagePath;
+      return imagePath;
     } catch (err) {
       continue;
     }
@@ -32,6 +32,7 @@ const UpcomingTrips = ({ searchQuery }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const tripsSectionRef = useRef(null);
 
   const loadRatingForOffer = async (idPONUDA) => {
     try {
@@ -122,10 +123,19 @@ const UpcomingTrips = ({ searchQuery }) => {
 
   useEffect(() => {
     if (originalTrips.length > 0) {
-      handleFilter(searchQuery);
+      if (!searchQuery || (!searchQuery.destination && !searchQuery.departureDate && !searchQuery.returnDate && !searchQuery.budget)) {
+        setTrips(originalTrips);
+      } else {
+        handleFilter(searchQuery);
+      }
     }
   }, [searchQuery, originalTrips]);
 
+  useEffect(() => {
+    if (searchQuery && tripsSectionRef.current) {
+      tripsSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [searchQuery]);
 
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
@@ -156,6 +166,11 @@ const UpcomingTrips = ({ searchQuery }) => {
     });
 
     setTrips(filteredTrips);
+  };
+
+  const handleResetFilters = () => {
+    setTrips(originalTrips);
+    setSortOrder('default');
   };
 
   if (loading) {
@@ -200,7 +215,7 @@ const UpcomingTrips = ({ searchQuery }) => {
   const sortedTrips = getSortedTrips();
 
   return (
-    <section className="upcoming-trips">
+    <section className="upcoming-trips" ref={tripsSectionRef}>
       <div className="container">
         <div className="section-header">
           <h2>Predstojeća putovanja</h2>
@@ -294,13 +309,13 @@ const UpcomingTrips = ({ searchQuery }) => {
                   <button
                     className="btn-view"
                     onClick={() => {
-                      const token = localStorage.getItem("token"); 
-                        if (token) {
+                      const token = localStorage.getItem("token");
+                      if (token) {
                         navigate(`/offerdetails/${trip.id}`);
-                        } else {
+                      } else {
                         navigate("/login");
-                        }
-                        }}
+                      }
+                    }}
                   >
                     Pogledaj
                   </button>
@@ -317,15 +332,15 @@ const UpcomingTrips = ({ searchQuery }) => {
                   <button
                     className="btn-share"
                     onClick={() => {
-                      const token = localStorage.getItem("token"); 
+                      const token = localStorage.getItem("token");
                       if (token) {
-                      navigate(`/inbox`, {
-                        state: { korisnickoImePrimaoca: trip.korisnickoImeAgencije } 
-                      });
+                        navigate(`/inbox`, {
+                          state: { korisnickoImePrimaoca: trip.korisnickoImeAgencije }
+                        });
                       } else {
-                       navigate("/login");
+                        navigate("/login");
                       }
-                  }}
+                    }}
                   >
                     Upit
                   </button>

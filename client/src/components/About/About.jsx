@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './About.css';
 
-import bgImg from '../../assets/tvoja-slika.png'; 
-import logoImg from '../../assets/logoIme.png';  
+import bgImg from '../../assets/tvoja-slika.png';
+import logoImg from '../../assets/logoIme.png';
 
 const About = () => {
   const [expanded, setExpanded] = useState(false);
@@ -23,8 +23,8 @@ Zato stvaramo platformu koja vas povezuje sa svijetom i inspiriše na nove korak
   const shortText = sentences.slice(0, 3).join('.') + '.';
 
   return (
-    <div 
-      className="about-bg" 
+    <div
+      className="about-bg"
       style={{ backgroundImage: `url(${bgImg})` }}
     >
       <div className={`about-overlay ${expanded ? "expanded" : ""}`}>
@@ -32,7 +32,7 @@ Zato stvaramo platformu koja vas povezuje sa svijetom i inspiriše na nove korak
         <img src={logoImg} alt="Logo" className="about-logo" />
 
         <p>{expanded ? fullText : shortText}</p>
-        <button 
+        <button
           className="read-more-btn"
           onClick={() => setExpanded(!expanded)}
         >

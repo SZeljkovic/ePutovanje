@@ -61,12 +61,12 @@ const CompareOffers = () => {
   };
 
   const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}.${month}.${year}`;
-};
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
 
   return (
     <div className="p-6">
@@ -75,14 +75,13 @@ const CompareOffers = () => {
       {error && <p className="text-red-500">{error}</p>}
 
       <div className="compare-layout">
-        {/* --- Lijevo: Lista ponuda --- */}
+        {/* Lijevo: Lista ponuda */}
         <div className="offers-grid">
           {offers.map((offer) => (
             <div
               key={offer.idPONUDA}
-              className={`offer-card ${
-                selected.includes(offer.idPONUDA) ? "selected" : ""
-              }`}
+              className={`offer-card ${selected.includes(offer.idPONUDA) ? "selected" : ""
+                }`}
               onClick={() => toggleSelect(offer.idPONUDA)}
             >
               <h3 className="font-semibold">{offer.Opis}</h3>
@@ -92,17 +91,17 @@ const CompareOffers = () => {
               </p>
               <p className="text-sm">Cijena: {offer.Cijena} KM</p>
               <p className="text-sm">Polazak: {formatDate(offer.DatumPolaska)}</p>
-			  
-			{/* Dugme za detalje */}
-<button
-  className="mt-3 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-  onClick={(e) => {
-    e.stopPropagation();
-    setModalOfferId(offer.idPONUDA); // umjesto navigacije
-  }}
->
-  Detaljnije
-</button>
+
+              {/* Dugme za detalje */}
+              <button
+                className="mt-3 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setModalOfferId(offer.idPONUDA);
+                }}
+              >
+                Detaljnije
+              </button>
 
 
 
@@ -110,15 +109,15 @@ const CompareOffers = () => {
           ))}
         </div>
 
-{/* Modal za detalje */}
-{modalOfferId && (
-  <OfferDetailsModal
-    id={modalOfferId}
-    onClose={() => setModalOfferId(null)}
-  />
-)}
+        {/* Modal za detalje */}
+        {modalOfferId && (
+          <OfferDetailsModal
+            id={modalOfferId}
+            onClose={() => setModalOfferId(null)}
+          />
+        )}
 
-        {/* --- Desno: Tabela poređenja --- */}
+        {/* Desno: Tabela poređenja */}
         <div className="comparison-table-wrapper">
           {comparison ? (
             <table className="comparison-table">
@@ -166,7 +165,7 @@ const CompareOffers = () => {
                     {formatDate(comparison.ponuda1.DatumPolaska)}
                   </td>
                   <td className={highlightClass(comparison.ponuda2.DatumPolaska, comparison.ponuda1.DatumPolaska)}>
-                     {formatDate(comparison.ponuda2.DatumPolaska)}
+                    {formatDate(comparison.ponuda2.DatumPolaska)}
                   </td>
                 </tr>
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SearchFilter.css';
 
-const SearchFilter = ({ onSearch }) => {
+const SearchFilter = ({ onSearch, onReset }) => {
   const [searchData, setSearchData] = useState({
     destination: '',
     departureDate: '',
@@ -22,9 +22,20 @@ const SearchFilter = ({ onSearch }) => {
     onSearch(searchData);
   };
 
+  const handleReset = () => {
+    setSearchData({
+      destination: '',
+      departureDate: '',
+      returnDate: '',
+      budget: ''
+    });
+    onReset();
+  };
+
   return (
     <div className="search-filter">
       <form className="search-form" onSubmit={handleSearch}>
+        {/* Lokacija */}
         <div className="search-field">
           <div className="field-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -43,8 +54,21 @@ const SearchFilter = ({ onSearch }) => {
         </div>
 
         {/* Datum polaska */}
-        <div className="search-field">
-          <div className="field-icon">
+        <div className="search-field" style={{
+          position: 'relative',
+          minWidth: '180px',
+          display: 'flex',
+          alignItems: 'center',
+          height: '40px',
+          boxSizing: 'border-box'
+        }}>
+          <div className="field-icon" style={{
+            position: 'absolute',
+            left: '12px',
+            zIndex: 2,
+            color: '#666',
+            pointerEvents: 'none'
+          }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
@@ -57,17 +81,49 @@ const SearchFilter = ({ onSearch }) => {
             name="departureDate"
             value={searchData.departureDate}
             onChange={handleInputChange}
-            placeholder="Datum polaska"
-            className="search-input date-input"
+            style={{
+              width: '100%',
+              height: '40px',
+              padding: '0 12px 0 40px',
+              border: '1px solid #e0e0e0',
+              borderRadius: '25px',
+              fontSize: '14px',
+              background: '#fff',
+              transition: 'all 0.3s ease',
+              color: searchData.departureDate ? '#333' : 'transparent',
+              outline: 'none'
+            }}
           />
-          <div className="date-placeholder">
-            {searchData.departureDate ? '' : 'Datum polaska'}
-          </div>
+          {!searchData.departureDate && (
+            <div style={{
+              position: 'absolute',
+              left: '40px',
+              pointerEvents: 'none',
+              color: '#999',
+              fontSize: '14px',
+              transition: 'opacity 0.3s ease'
+            }}>
+              Datum polaska
+            </div>
+          )}
         </div>
 
         {/* Datum povratka */}
-        <div className="search-field">
-          <div className="field-icon">
+        <div className="search-field" style={{
+          position: 'relative',
+          minWidth: '180px',
+          display: 'flex',
+          alignItems: 'center',
+          height: '40px',
+          boxSizing: 'border-box'
+        }}>
+          <div className="field-icon" style={{
+            position: 'absolute',
+            left: '12px',
+            zIndex: 2,
+            color: '#666',
+            pointerEvents: 'none'
+          }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
@@ -80,20 +136,39 @@ const SearchFilter = ({ onSearch }) => {
             name="returnDate"
             value={searchData.returnDate}
             onChange={handleInputChange}
-            placeholder="Datum povratka"
-            className="search-input date-input"
+            style={{
+              width: '100%',
+              height: '40px',
+              padding: '0 12px 0 40px',
+              border: '1px solid #e0e0e0',
+              borderRadius: '25px',
+              fontSize: '14px',
+              background: '#fff',
+              transition: 'all 0.3s ease',
+              color: searchData.returnDate ? '#333' : 'transparent',
+              outline: 'none'
+            }}
           />
-          <div className="date-placeholder">
-            {searchData.returnDate ? '' : 'Datum povratka'}
-          </div>
+          {!searchData.returnDate && (
+            <div style={{
+              position: 'absolute',
+              left: '40px',
+              pointerEvents: 'none',
+              color: '#999',
+              fontSize: '14px',
+              transition: 'opacity 0.3s ease'
+            }}>
+              Datum povratka
+            </div>
+          )}
         </div>
 
+        {/* Budzet */}
         <div className="search-field">
           <div className="field-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-              <line x1="8" y1="21" x2="16" y2="21" />
-              <line x1="12" y1="17" x2="12" y2="21" />
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
             </svg>
           </div>
           <input
@@ -101,7 +176,7 @@ const SearchFilter = ({ onSearch }) => {
             name="budget"
             value={searchData.budget}
             onChange={handleInputChange}
-            placeholder="Do koliko novca (BAM)?"
+            placeholder="Do koliko novca?"
             className="search-input"
             min="0"
           />
@@ -114,6 +189,18 @@ const SearchFilter = ({ onSearch }) => {
           </svg>
           Traži
         </button>
+
+        <button 
+          type="button" 
+          className="refresh-button"
+          onClick={handleReset}
+          title="Poništi filtere"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+
       </form>
     </div>
   );

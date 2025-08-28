@@ -11,15 +11,19 @@ import Navbar from '../components/Navbar/Navbar';
 
 const Home = () => {
 
-   const [searchQuery, setSearchQuery] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(null);
 
-   const handleSearch = (searchData) => {
+  const handleSearch = (searchData) => {
     setSearchQuery(searchData);
   };
 
+  const handleReset = () => {
+  setSearchQuery(null);
+};
+
   return (
     <>
-      <Hero onSearch={handleSearch} />
+      <Hero onSearch={handleSearch} onReset={handleReset}/>
       <div className='container'>
         <Navbar />
         <Title subTitle='Ponude' />

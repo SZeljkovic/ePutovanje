@@ -22,7 +22,7 @@ const { loggedIn, user, logout } = useContext(AuthContext);
   };
 
   return (
-    <nav className={`container ${sticky ? "dark-nav" : ""}`}>
+    <nav className={`container-nav ${sticky ? "dark-nav" : ""}`}>
       <img src={logo} alt="" className="logo" />
       <ul>
         <li><Link to="/">Početna</Link></li>
