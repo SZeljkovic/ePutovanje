@@ -17,6 +17,8 @@ import OfferDetails from './pages/OfferDetails';
 import CompareOffers from "./components/CompareOffers/CompareOffers";
 import CompareModal from "./components/CompareOffers/CompareModal";
 
+
+
 const App = () => {
   const location = useLocation();
   const navigate = useNavigate();

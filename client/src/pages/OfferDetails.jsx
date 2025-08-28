@@ -27,9 +27,11 @@ const getDestinationImage = (destinationName) => {
   return '/assets/default.jpg';
 };
 
-const OfferDetails = () => {
-  const { id } = useParams();
+const OfferDetails = ({ modalId }) => {
+  const { id: routeId } = useParams();
+  const id = modalId || routeId;   // ako je došao iz modala koristi props, inače koristi useParams
   const navigate = useNavigate();
+
 
   const [offer, setOffer] = useState(null);
   const [rating, setRating] = useState(0);
@@ -142,9 +144,12 @@ const OfferDetails = () => {
 
   return (
     <div className="offer-details">
-      <button className="back-button" onClick={() => navigate(-1)}>
-        ← Nazad
-      </button>
+      {!modalId && (
+  <button className="back-button" onClick={() => navigate(-1)}>
+    ← Nazad
+  </button>
+)}
+
 
       <div className="offer-image">
   <img

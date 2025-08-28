@@ -17,7 +17,7 @@
 
 .offer-card {
   position: relative;
-  z-index: 1001; 
+  z-index: 999; 
   border: none;
   border-radius: 1rem;
   cursor: pointer;
@@ -85,8 +85,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 998; 
 }
+
 
 .modal-content {
   background: #fff;
