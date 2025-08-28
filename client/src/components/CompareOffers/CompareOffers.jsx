@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./CompareOffers.css";
+import { useNavigate } from "react-router-dom";
+import OfferDetailsModal from "../../pages/OfferDetailsModal";
+
 
 const CompareOffers = () => {
   const [offers, setOffers] = useState([]);
   const [selected, setSelected] = useState([]);
   const [comparison, setComparison] = useState(null);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [modalOfferId, setModalOfferId] = useState(null);
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -87,9 +92,31 @@ const CompareOffers = () => {
               </p>
               <p className="text-sm">Cijena: {offer.Cijena} KM</p>
               <p className="text-sm">Polazak: {formatDate(offer.DatumPolaska)}</p>
+			  
+			{/* Dugme za detalje */}
+<button
+  className="mt-3 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+  onClick={(e) => {
+    e.stopPropagation();
+    setModalOfferId(offer.idPONUDA); // umjesto navigacije
+  }}
+>
+  Detaljnije
+</button>
+
+
+
             </div>
           ))}
         </div>
+
+{/* Modal za detalje */}
+{modalOfferId && (
+  <OfferDetailsModal
+    id={modalOfferId}
+    onClose={() => setModalOfferId(null)}
+  />
+)}
 
         {/* --- Desno: Tabela poređenja --- */}
         <div className="comparison-table-wrapper">
