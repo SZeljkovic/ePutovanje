@@ -12,10 +12,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Import baze
 const db = require('./db');
 
-// Test ruta
 app.get('/', (req, res) => {
     res.send('ePutovanje backend radi!');
 });
@@ -118,7 +116,6 @@ app.post('/register', async (req, res) => {
         return res.status(400).json({ error: "Nevažeći tip korisnika." });
     }
 
-    //  Validacija obaveznih polja
     if (!KorisnickoIme || !Lozinka || !Email) {
         return res.status(400).json({ error: "Korisničko ime, lozinka i email su obavezni." });
     }
@@ -134,11 +131,9 @@ app.post('/register', async (req, res) => {
     }
 
     try {
-        //  Heširanje lozinke
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(Lozinka, saltRounds);
 
-        //  Provjera da li korisničko ime već postoji
         const [existing] = await db.promise().query(
             "SELECT * FROM korisnik WHERE KorisnickoIme = ?",
             [KorisnickoIme]
@@ -148,10 +143,8 @@ app.post('/register', async (req, res) => {
             return res.status(409).json({ error: "Korisničko ime već postoji." });
         }
 
-        //  Određivanje statusa naloga
         const StatusNaloga = TipKorisnika === 1 ? 0 : 1;
 
-        //  Upit za ubacivanje u bazu
         const insertQuery = `
             INSERT INTO korisnik 
             (Ime, Prezime, NazivAgencije, DatumRodjenja, KorisnickoIme, Lozinka, TipKorisnika, StatusNaloga, Email)
@@ -440,7 +433,6 @@ app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, re
     }
 
     try {
-        // Provjera da li korisničko ime već postoji
         const [existing] = await db.promise().query(
             "SELECT * FROM korisnik WHERE KorisnickoIme = ?",
             [KorisnickoIme]
@@ -450,7 +442,6 @@ app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, re
             return res.status(409).json({ error: "Korisničko ime već postoji." });
         }
 
-        // Heširanje lozinke
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(Lozinka, saltRounds);
 
@@ -458,7 +449,6 @@ app.post('/register-admin', authenticateToken, authenticateAdmin, async (req, re
         const TipKorisnika = 0;
         const StatusNaloga = 1;
 
-        // Ubacivanje u bazu
         const insertQuery = `
             INSERT INTO korisnik
             (Ime, Prezime, KorisnickoIme, Lozinka, TipKorisnika, StatusNaloga, Email)
@@ -491,7 +481,6 @@ app.post('/forgot-password', async (req, res) => {
     }
 
     try {
-        // Provjera da li korisnik postoji
         const [rows] = await db.promise().query(
             "SELECT * FROM korisnik WHERE KorisnickoIme = ?",
             [KorisnickoIme]
@@ -503,11 +492,9 @@ app.post('/forgot-password', async (req, res) => {
 
         const korisnik = rows[0];
 
-        // Generiši novu privremenu lozinku
         const novaLozinka = crypto.randomBytes(6).toString('hex');
         const hashedLozinka = await bcrypt.hash(novaLozinka, 10);
 
-        // Ažuriraj lozinku u bazi
         await db.promise().query(
             "UPDATE korisnik SET Lozinka = ? WHERE KorisnickoIme = ?",
             [hashedLozinka, KorisnickoIme]
@@ -554,7 +541,6 @@ app.delete('/delete-profile/:id', authenticateToken, authenticateAdmin, async (r
     const idKorisnik = req.params.id;
 
     try {
-        // Provjera da li korisnik postoji
         const [rows] = await db.promise().query(
             "SELECT * FROM korisnik WHERE idKORISNIK = ?",
             [idKorisnik]
@@ -569,7 +555,6 @@ app.delete('/delete-profile/:id', authenticateToken, authenticateAdmin, async (r
             return res.status(400).json({ error: "Ne možete obrisati svoj administratorski nalog." });
         }
 
-        // Brisanje korisnika
         await db.promise().query(
             "DELETE FROM korisnik WHERE idKORISNIK = ?",
             [idKorisnik]
@@ -773,7 +758,7 @@ app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, 
         tipPrevoza,
         brojSlobodnihMjesta,
         najatraktivnijaPonuda,
-        idDESTINACIJA // Dodajemo ID destinacije u tijelo zahtjeva
+        idDESTINACIJA
     } = req.body;
 
     if (!idDESTINACIJA) {
@@ -789,7 +774,6 @@ app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, 
     const statusPonude = 0;
 
     try {
-        // Prvo unosimo ponudu
         const [result] = await db.promise().query(`
             INSERT INTO ponuda (
                 Cijena,
@@ -1071,13 +1055,11 @@ app.delete('/obrisi-ponudu/:id', authenticateToken, authenticateAgency, async (r
     const idPONUDA = req.params.id;
 
     try {
-        // Prvo obriši sve veze između ponude i destinacija
         await db.promise().query(
             "DELETE FROM ponuda_has_destinacija WHERE idPONUDA = ?",
             [idPONUDA]
         );
 
-        // Zatim obriši samu ponudu
         const [result] = await db.promise().query(
             "DELETE FROM ponuda WHERE idPONUDA = ?",
             [idPONUDA]
@@ -1212,7 +1194,7 @@ app.get('/ponude/moje-neodobrene', authenticateToken, authenticateAgency, async 
 // pregled pojedinacne ponude - agencija (moze samo svoje ponude gledati)
 app.get('/ponude/moje/:id', authenticateToken, authenticateAgency, async (req, res) => {
     const idPONUDA = req.params.id;
-    const idKorisnik = req.user.idKORISNIK;  // Koristimo idKORISNIK iz tokena direktno
+    const idKorisnik = req.user.idKORISNIK;
 
     try {
         const [rows] = await db.promise().query(`
@@ -1410,7 +1392,6 @@ app.put('/zahtjevi-rezervacija/:id/status', authenticateToken, authenticateAgenc
             return res.status(400).json({ error: "Ova rezervacija je već procesuirana." });
         }
 
-        // Ažuriraj status rezervacije
         await db.promise().query(`
             UPDATE rezervacija
             SET StatusRezervacije = ?
@@ -1421,7 +1402,6 @@ app.put('/zahtjevi-rezervacija/:id/status', authenticateToken, authenticateAgenc
         const akcija = status == 1 ? 'prihvaćena' : (status == -1 ? 'odbijena' : 'na čekanju');
         const sadrzaj = `Vaša rezervacija za ponudu "${rezervacija.NazivPonude}" je ${akcija}.`;
 
-        // Insert u obavještenje
         await db.promise().query(`
             INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
             VALUES (?, NOW(), 0, ?)
@@ -1503,7 +1483,7 @@ app.get('/sve-rezervacije/:id', authenticateToken, authenticateAgency, async (re
 });
 
 
-// Pregled svih odbijenih rezervacija (turistič=cka agencija)
+// Pregled svih odbijenih rezervacija (turistička agencija)
 app.get('/odbijene-rezervacije', authenticateToken, authenticateAgency, async (req, res) => {
     const idAgencije = req.user.idKORISNIK;
 
@@ -1643,7 +1623,7 @@ app.post('/poruka', authenticateToken, async (req, res) => {
                 return res.status(400).json({ error: "Nije pronađen primalac." });
             }
 
-            // Provjeri postoji li već čet
+            // Provjera postoji li već čet
             const [existingChat] = await db.promise().query(`
                 SELECT idČET FROM čet
                 WHERE (idKORISNIK1 = ? AND idKORISNIK2 = ?) OR (idKORISNIK1 = ? AND idKORISNIK2 = ?)
@@ -1659,7 +1639,6 @@ app.post('/poruka', authenticateToken, async (req, res) => {
             }
         }
 
-        // Ubaci poruku
         await db.promise().query(`
             INSERT INTO poruka (Sadržaj, VrijemeSlanja, Pročitano, idČET, idPOŠILJALAC)
             VALUES (?, NOW(), 0, ?, ?)
@@ -1693,7 +1672,6 @@ app.post('/recenzija', authenticateToken, async (req, res) => {
             return res.status(409).json({ error: "Već ste ostavili recenziju za ovu ponudu." });
         }
 
-        // Unos recenzije
         await db.promise().query(`
             INSERT INTO recenzija (idKORISNIK, idPONUDA, Komentar, Ocjena, DatumIVrijeme)
             VALUES (?, ?, ?, ?, NOW())
@@ -1883,7 +1861,6 @@ app.get('/ponude/filter', async (req, res) => {
             najatraktivnije
         } = req.query;
 
-        // Osnovni upit
         let query = `
             SELECT 
                 p.idPONUDA,
@@ -2001,13 +1978,11 @@ app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
     }
 });
 
-// Get details for a specific reservation
 app.get('/moje-rezervacije/:id', authenticateToken, async (req, res) => {
     const idRezervacija = req.params.id;
     const idKorisnik = req.user.idKORISNIK;
 
     try {
-        // Get basic reservation info
         const [rezervacija] = await db.promise().query(`
             SELECT 
                 r.*,
@@ -2023,7 +1998,6 @@ app.get('/moje-rezervacije/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: "Rezervacija nije pronađena." });
         }
 
-        // Get destinations for this offer
         const [destinacije] = await db.promise().query(`
             SELECT d.* 
             FROM destinacija d
@@ -2031,7 +2005,6 @@ app.get('/moje-rezervacije/:id', authenticateToken, async (req, res) => {
             WHERE phd.idPONUDA = ?
         `, [rezervacija[0].idPONUDA]);
 
-        // Format response
         const response = {
             ...rezervacija[0],
             Destinacije: destinacije,
@@ -2051,7 +2024,6 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
     const { idPONUDA, BrojOdraslih, BrojDjece } = req.body;
     const idKorisnik = req.user.idKORISNIK;
 
-    // Validacija
     if (!idPONUDA || BrojOdraslih === undefined || BrojDjece === undefined) {
         return res.status(400).json({ error: "idPONUDA, BrojOdraslih i BrojDjece su obavezni." });
     }
