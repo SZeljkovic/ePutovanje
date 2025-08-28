@@ -234,18 +234,21 @@ const AdminHome = () => {
   };
 
   const handleDeleteAccount = async (userId) => {
-    if (window.confirm("Da li ste sigurni da želite da obrišete ovaj nalog?")) {
-      try {
-        await axios.delete(`http://localhost:5000/delete-profile/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setSuccess("Nalog je uspešno obrisan");
-        loadAllUsers();
-      } catch (err) {
-        setError(err.response?.data?.error || "Greška pri brisanju naloga");
-      }
+  if (window.confirm("Da li ste sigurni da želite da obrišete ovaj nalog?")) {
+    try {
+      await axios.delete(`http://localhost:5000/delete-profile/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess("Nalog je uspešno obrisan");
+      loadAllUsers();
+    } catch (err) {
+      const poruka = err.response?.data?.error || "Greška pri brisanju naloga";
+      alert(poruka); // ⬅ najjednostavniji popup
+      setError(poruka);
     }
-  };
+  }
+};
+
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
