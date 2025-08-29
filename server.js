@@ -197,6 +197,10 @@ app.put('/login', async (req, res) => {
             return res.status(403).json({ error: "Vaš nalog još nije odobren od strane administratora." });
         }
 
+        if (user.StatusNaloga === -1) {
+            return res.status(403).json({ error: "Vaš nalog je suspendovan od strane administratora." });
+        }
+
         const passwordMatch = await bcrypt.compare(Lozinka, user.Lozinka);
 
         if (!passwordMatch) {
@@ -654,6 +658,11 @@ app.put('/suspend-account/:id', authenticateToken, authenticateAdmin, async (req
             [idKorisnik]
         );
 
+        await db.promise().query(
+            "INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK) VALUES (?, NOW(), 0, ?)",
+            [`Vaš nalog je prethodno bio suspendovan od strane administratora.`, idKorisnik]
+        );
+
         return res.json({ message: "Nalog korisnika je suspendovan." });
 
     } catch (err) {
@@ -940,6 +949,8 @@ app.get('/ponude', async (req, res) => {
                 korisnik k ON p.idKORISNIK = k.idKORISNIK
             WHERE 
                 p.StatusPonude = 1
+            AND
+                k.StatusNaloga != -1
             ORDER BY 
                 p.DatumObjavljivanja DESC
         `;
