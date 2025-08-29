@@ -102,7 +102,7 @@ const MyReservations = () => {
               <p><strong>{r.OpisPonude}</strong> ({r.Destinacije})</p>
               <p>📅 {new Date(r.Datum).toLocaleDateString()}</p>
               <p>Status: {r.StatusText}</p>
-              <p>Ukupna cijena: {r.UkupnaCijena} €</p>
+              <p>Ukupna cijena: {r.UkupnaCijena} BAM</p>
               <button
                 className="details-toggle"
                 onClick={() => toggleDetalji(r.idREZERVACIJA)}
