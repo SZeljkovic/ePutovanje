@@ -116,8 +116,8 @@ const MyReservations = () => {
                   <p><strong>Agencija:</strong> {detalji[r.idREZERVACIJA].NazivAgencije}</p>
                   <p><strong>Broj odraslih:</strong> {detalji[r.idREZERVACIJA].BrojOdraslih}</p>
                   <p><strong>Broj djece:</strong> {detalji[r.idREZERVACIJA].BrojDjece}</p>
-                  <p><strong>Cijena po osobi:</strong> {detalji[r.idREZERVACIJA].Cijena} €</p>
-                  <p><strong>Ukupna cijena:</strong> {detalji[r.idREZERVACIJA].UkupnaCijena} €</p>
+                  <p><strong>Cijena po osobi:</strong> {detalji[r.idREZERVACIJA].Cijena} BAM</p>
+                  <p><strong>Ukupna cijena:</strong> {detalji[r.idREZERVACIJA].UkupnaCijena} BAM</p>
                   <p><strong>Polazak:</strong> {new Date(detalji[r.idREZERVACIJA].DatumPolaska).toLocaleDateString()}</p>
                   <p><strong>Povratak:</strong> {new Date(detalji[r.idREZERVACIJA].DatumPovratka).toLocaleDateString()}</p>
                   <p><strong>Tip prevoza:</strong> {detalji[r.idREZERVACIJA].TipPrevoza}</p>
