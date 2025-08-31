@@ -164,18 +164,18 @@ const AdminHome = () => {
   };
 
   const loadProblems = async () => {
-  try {
-    setLoading(true);
-    const res = await axios.get("http://localhost:5000/problemi", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setProblems(res.data);
-  } catch (err) {
-    setError("Greška pri učitavanju problema");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:5000/problemi", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProblems(res.data);
+    } catch (err) {
+      setError("Greška pri učitavanju problema");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handleApproveAgency = async (id) => {
@@ -234,20 +234,20 @@ const AdminHome = () => {
   };
 
   const handleDeleteAccount = async (userId) => {
-  if (window.confirm("Da li ste sigurni da želite da obrišete ovaj nalog?")) {
-    try {
-      await axios.delete(`http://localhost:5000/delete-profile/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSuccess("Nalog je uspešno obrisan");
-      loadAllUsers();
-    } catch (err) {
-      const poruka = err.response?.data?.error || "Greška pri brisanju naloga";
-      alert(poruka); // ⬅ najjednostavniji popup
-      setError(poruka);
+    if (window.confirm("Da li ste sigurni da želite da obrišete ovaj nalog?")) {
+      try {
+        await axios.delete(`http://localhost:5000/delete-profile/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSuccess("Nalog je uspešno obrisan");
+        loadAllUsers();
+      } catch (err) {
+        const poruka = err.response?.data?.error || "Greška pri brisanju naloga";
+        alert(poruka); // ⬅ najjednostavniji popup
+        setError(poruka);
+      }
     }
-  }
-};
+  };
 
 
   const handleCreateAdmin = async (e) => {
@@ -411,7 +411,7 @@ const AdminHome = () => {
       loadSuspendedUsers();
     } else if (activeSection === "destinations") {
       loadDestinations();
-    } else if (activeSection === "profile") { 
+    } else if (activeSection === "profile") {
       loadProfile();
     }
     else if (activeSection === "problems") {
@@ -586,7 +586,7 @@ const AdminHome = () => {
                       )}
                       <div className="user-details-row">
                         <div className="user-detail-item">
-                          <strong>Korisničko ime: </strong> 
+                          <strong>Korisničko ime: </strong>
                           <span className="user-value">{user.KorisnickoIme}</span>
                         </div>
                         <div className="user-detail-item">
@@ -598,7 +598,7 @@ const AdminHome = () => {
                           <span className="user-value">{getTipKorisnikaText(user.TipKorisnika)}</span>
                         </div>
                         <div className="user-detail-item">
-                          <strong>Status: </strong> 
+                          <strong>Status: </strong>
                           <span className="user-value">{getStatusText(user.StatusNaloga)}</span>
                         </div>
                       </div>
@@ -633,7 +633,7 @@ const AdminHome = () => {
             <h2>Suspendovani Nalozi</h2>
             {loading ? (
               <p>Učitavanje...</p>
-            ) : (
+            ) : suspendedUsers.length > 0 ? (
               <div className="users-table">
                 {suspendedUsers.map(user => (
                   <div key={user.idKORISNIK} className="user-card">
@@ -664,6 +664,8 @@ const AdminHome = () => {
                   </div>
                 ))}
               </div>
+            ) : (
+              <p>Nema suspendovanih naloga.</p>
             )}
           </div>
         )}
@@ -899,26 +901,26 @@ const AdminHome = () => {
         )}
 
         {/* Lista problema */}
-{activeSection === "problems" && (
-  <div className="problems-section">
-    <h2>Prijavljeni problemi korisnika</h2>
-    {loading ? (
-      <p>Učitavanje...</p>
-    ) : problems.length > 0 ? (
-      <div className="problems-list">
-        {problems.map(problem => (
-          <div key={problem.idPROBLEM} className="problem-card">
-            <h4>{problem.Naslov}</h4>
-            <p><strong>Korisnik:</strong> {problem.KorisnickoIme} (ID: {problem.idKORISNIK})</p>
-            <p>{problem.Sadržaj}</p>
+        {activeSection === "problems" && (
+          <div className="problems-section">
+            <h2>Prijavljeni problemi korisnika</h2>
+            {loading ? (
+              <p>Učitavanje...</p>
+            ) : problems.length > 0 ? (
+              <div className="problems-list">
+                {problems.map(problem => (
+                  <div key={problem.idPROBLEM} className="problem-card">
+                    <h4>{problem.Naslov}</h4>
+                    <p><strong>Korisnik:</strong> {problem.KorisnickoIme} (ID: {problem.idKORISNIK})</p>
+                    <p>{problem.Sadržaj}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Trenutno nema prijavljenih problema.</p>
+            )}
           </div>
-        ))}
-      </div>
-    ) : (
-      <p className="empty-state">Trenutno nema prijavljenih problema.</p>
-    )}
-  </div>
-)}
+        )}
 
 
       </div>
