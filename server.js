@@ -1260,7 +1260,6 @@ app.get('/ponude/moje/:id', authenticateToken, authenticateAgency, async (req, r
 
 
 // izmjena ponude - agencija može mijenjati samo svoje ponude
-
 app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req, res) => {
     const idPONUDA = req.params.id;
     const idKorisnik = req.user.idKORISNIK;
@@ -1273,7 +1272,8 @@ app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req,
         tipPrevoza,
         brojSlobodnihMjesta,
         najatraktivnijaPonuda,
-        idDESTINACIJA
+        idDESTINACIJA,
+        statusPonude
     } = req.body;
 
     if (brojSlobodnihMjesta !== undefined && brojSlobodnihMjesta < 1) {
@@ -1282,49 +1282,62 @@ app.put('/izmjenaponude/:id', authenticateToken, authenticateAgency, async (req,
 
     try {
         // Provjeri da li ponuda pripada toj agenciji
-        const [check] = await db.promise().query(`
-            SELECT * FROM ponuda WHERE idPONUDA = ? AND idKORISNIK = ?
-        `, [idPONUDA, idKorisnik]);
+        const [check] = await db.promise().query(
+            `SELECT * FROM ponuda WHERE idPONUDA = ? AND idKORISNIK = ?`,
+            [idPONUDA, idKorisnik]
+        );
 
         if (check.length === 0) {
             return res.status(404).json({ error: "Ponuda nije pronađena ili ne pripada ovoj agenciji." });
         }
 
-        // Ažuriranje ponude
+        // Stari status iz baze
+        const stariStatus = check[0].StatusPonude;
 
-        await db.promise().query(`
-			UPDATE ponuda
-			SET 
-				Cijena = ?, 
-				Opis = ?, 
-				DatumPolaska = ?, 
-				DatumPovratka = ?, 
-				TipPrevoza = ?, 
-				BrojSlobodnihMjesta = ?, 
-				NajatraktivnijaPonuda = ?,
-				StatusPonude = 0          -- reset statusa na "na čekanju odobrenja"
-			WHERE idPONUDA = ?
-		`, [
-            cijena,
-            opis,
-            datumPolaska,
-            datumPovratka,
-            tipPrevoza,
-            brojSlobodnihMjesta,
-            najatraktivnijaPonuda ? 1 : 0,
-            idPONUDA
-        ]);
+        let noviStatus;
 
+        if (statusPonude !== undefined && statusPonude !== stariStatus) {
+            // Ako je eksplicitno mijenjan status → koristi taj
+            noviStatus = statusPonude;
+        } else {
+            // Inače, ako se mijenjaju drugi podaci → resetuj na 0
+            noviStatus = 0;
+        }
+
+        await db.promise().query(
+            `UPDATE ponuda
+             SET 
+                Cijena = ?, 
+                Opis = ?, 
+                DatumPolaska = ?, 
+                DatumPovratka = ?, 
+                TipPrevoza = ?, 
+                BrojSlobodnihMjesta = ?, 
+                NajatraktivnijaPonuda = ?,
+                StatusPonude = ?
+             WHERE idPONUDA = ?`,
+            [
+                cijena,
+                opis,
+                datumPolaska,
+                datumPovratka,
+                tipPrevoza,
+                brojSlobodnihMjesta,
+                najatraktivnijaPonuda ? 1 : 0,
+                noviStatus,
+                idPONUDA
+            ]
+        );
 
         if (idDESTINACIJA) {
-            // Ažuriranje destinacije
-            await db.promise().query(`
-                UPDATE ponuda_has_destinacija 
-                SET idDESTINACIJA = ? 
-                WHERE idPONUDA = ?
-            `, [idDESTINACIJA, idPONUDA]);
+            await db.promise().query(
+                `UPDATE ponuda_has_destinacija 
+                 SET idDESTINACIJA = ? 
+                 WHERE idPONUDA = ?`,
+                [idDESTINACIJA, idPONUDA]
+            );
         }
-        //ponuda kad se azurira ponovo postaje zahtjev i treba je administrator odobriti/odbiti
+
         res.json({ message: "Ponuda uspješno ažurirana." });
     } catch (err) {
         console.error("Greška pri ažuriranju ponude:", err);

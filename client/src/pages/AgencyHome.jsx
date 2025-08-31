@@ -302,6 +302,7 @@ const AgencyHome = () => {
         brojSlobodnihMjesta: ponudaForm.BrojSlobodnihMjesta,
         najatraktivnijaPonuda: ponudaForm.NajatraktivnijaPonuda,
         idDESTINACIJA: ponudaForm.idDESTINACIJA,
+        statusPonude: ponudaForm.StatusPonude,
       };
 
 
@@ -608,6 +609,19 @@ const AgencyHome = () => {
                       }
                     />
                   </label>
+                  <label>
+                    Status ponude:
+                    <select
+                      name="StatusPonude"
+                      value={ponudaForm.StatusPonude ?? 1}
+                      onChange={handlePonudaChange}
+                    >
+                      <option value={1}>✅ Aktivna</option>
+                      <option value={0}>⏳ Na čekanju</option>
+                      <option value={-1}>🚫 Privremeno uklonjena</option>
+                    </select>
+                  </label>
+
                   <button onClick={handleUpdatePonuda}>💾 Sačuvaj</button>
                   <button onClick={() => setEditMode(false)}>⬅ Nazad</button>
                 </div>

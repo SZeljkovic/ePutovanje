@@ -89,7 +89,6 @@ const ClientProfile = () => {
             <p><strong>Korisničko ime:</strong> {profil.KorisnickoIme}</p>
             <p><strong>Email:</strong> {profil.Email}</p>
             <p><strong>Datum rođenja:</strong> {profil.DatumRodjenja ? profil.DatumRodjenja.split("T")[0] : "N/A"}</p>
-            <p><strong>Status naloga:</strong> {profil.StatusNaloga}</p>
           </div>
 
           <form className="profile-edit-form" onSubmit={handleSave}>
