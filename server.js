@@ -97,7 +97,10 @@ async function authenticateAgency(req, res, next) {
     }
 }
 
-
+const formatDatum = (datum) => {
+    const d = new Date(datum);
+    return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+};
 
 app.post('/register', async (req, res) => {
     const {
@@ -571,8 +574,8 @@ app.delete('/delete-profile/:id', authenticateToken, authenticateAdmin, async (r
 
         // Ako je foreign key constraint (errno 1451)
         if (err.code === "ER_ROW_IS_REFERENCED_2") {
-            return res.status(400).json({ 
-                error: "Nije moguće obrisati nalog koji ima vezane ponude ili obavještenja." 
+            return res.status(400).json({
+                error: "Nije moguće obrisati nalog koji ima vezane ponude ili obavještenja."
             });
         }
 
@@ -827,6 +830,26 @@ app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, 
             VALUES (?, ?)
         `, [idPONUDA, idDESTINACIJA]);
 
+        const [info] = await db.promise().query(`
+            SELECT k.NazivAgencije, d.Naziv AS NazivDestinacije
+            FROM korisnik k
+            JOIN destinacija d ON d.idDESTINACIJA = ?
+            WHERE k.idKORISNIK = ?
+        `, [idDESTINACIJA, idKorisnik]);
+
+        const agencija = info[0].NazivAgencije;
+        const destinacija = info[0].NazivDestinacije;
+
+        // 4. Formatiranje sadržaja obavještenja
+        const sadrzaj = `Agencija "${agencija}" je kreirala novu ponudu za destinaciju "${destinacija}" (${formatDatum(datumPolaska)} - ${formatDatum(datumPovratka)}).`;
+
+        // 5. Slanje obavještenja administratoru (ID 0)
+        await db.promise().query(`
+            INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+            VALUES (?, NOW(), 0, 1)
+        `, [sadrzaj]);
+
+
         res.status(201).json({ message: "Ponuda uspješno kreirana i povezana s destinacijom. Čeka odobrenje administratora." });
     } catch (err) {
         console.error("Greška pri kreiranju ponude:", err);
@@ -836,24 +859,31 @@ app.post('/zahtjevi-ponuda', authenticateToken, authenticateAgency, async (req, 
 
 
 
-//odobravanje ili odbijanje zahtjeva za ponudu - administrator
 app.put('/zahtjevi-ponuda/:id/status', authenticateToken, authenticateAdmin, async (req, res) => {
     const idPonude = req.params.id;
-    const { StatusPonude } = req.body; // sada se očekuje broj: 1 ili -1
+    const { StatusPonude } = req.body; // 1 = odobrena, -1 = poništena
 
     if (![1, -1].includes(StatusPonude)) {
         return res.status(400).json({ error: "Dozvoljene vrijednosti za StatusPonude su 1 (odobrena) i -1 (poništena)." });
     }
 
     try {
-        const [rows] = await db.promise().query(
-            "SELECT * FROM ponuda WHERE idPONUDA = ?",
-            [idPonude]
-        );
+        const [rows] = await db.promise().query(`
+            SELECT p.idPONUDA, p.idKORISNIK, 
+                   GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS NazivDestinacija,
+                   p.DatumPolaska, p.DatumPovratka
+            FROM ponuda p
+            LEFT JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            LEFT JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            WHERE p.idPONUDA = ?
+            GROUP BY p.idPONUDA
+        `, [idPonude]);
 
         if (rows.length === 0) {
             return res.status(404).json({ error: "Ponuda nije pronađena." });
         }
+
+        const ponuda = rows[0];
 
         await db.promise().query(
             "UPDATE ponuda SET StatusPonude = ? WHERE idPONUDA = ?",
@@ -861,7 +891,16 @@ app.put('/zahtjevi-ponuda/:id/status', authenticateToken, authenticateAdmin, asy
         );
 
         const akcija = StatusPonude === 1 ? 'odobrena' : 'poništena';
+
+        const sadrzaj = `Vaša ponuda: ${ponuda.NazivDestinacija} (${formatDatum(ponuda.DatumPolaska)} - ${formatDatum(ponuda.DatumPovratka)}) je ${akcija}.`;
+
+        await db.promise().query(`
+            INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+            VALUES (?, NOW(), 0, ?)
+        `, [sadrzaj, ponuda.idKORISNIK]);
+
         res.json({ message: `Ponuda je ${akcija}.` });
+
     } catch (err) {
         console.error("Greška pri ažuriranju ponude:", err);
         res.status(500).json({ error: "Greška na serveru." });
@@ -1427,9 +1466,14 @@ app.put('/zahtjevi-rezervacija/:id/status', authenticateToken, authenticateAgenc
                 r.idREZERVACIJA,
                 r.idKORISNIK AS idKlijenta,
                 r.StatusRezervacije,
-                p.Opis AS NazivPonude
+                p.Opis AS NazivPonude,
+                p.DatumPolaska,
+                p.DatumPovratka,
+                GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS NazivDestinacija
             FROM rezervacija r
             JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
             WHERE r.idREZERVACIJA = ? AND p.idKORISNIK = ?
         `, [idRezervacije, idAgencije]);
 
@@ -1451,7 +1495,7 @@ app.put('/zahtjevi-rezervacija/:id/status', authenticateToken, authenticateAgenc
 
         // Tekst obavještenja
         const akcija = status == 1 ? 'prihvaćena' : (status == -1 ? 'odbijena' : 'na čekanju');
-        const sadrzaj = `Vaša rezervacija za ponudu "${rezervacija.NazivPonude}" je ${akcija}.`;
+        const sadrzaj = `Vaša rezervacija za ponudu: ${rezervacija.NazivDestinacija} (${formatDatum(rezervacija.DatumPolaska)} - ${formatDatum(rezervacija.DatumPovratka)}) je ${akcija}.`;
 
         await db.promise().query(`
             INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
@@ -1701,7 +1745,6 @@ app.post('/poruka', authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Greška na serveru." });
     }
 });
-
 
 
 
@@ -2082,10 +2125,15 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
     try {
         // 1. Provjera ponude
         const [ponuda] = await db.promise().query(`
-            SELECT p.*, k.NazivAgencije 
+            SELECT p.idPONUDA, p.DatumPolaska, p.DatumPovratka, p.BrojSlobodnihMjesta,
+                   k.idKORISNIK AS idAgencije,
+                   GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS NazivDestinacija
             FROM ponuda p
             JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
+            LEFT JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            LEFT JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
             WHERE p.idPONUDA = ? AND p.StatusPonude = 1
+            GROUP BY p.idPONUDA
         `, [idPONUDA]);
 
         if (ponuda.length === 0) {
@@ -2113,13 +2161,15 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
             WHERE idPONUDA = ?
         `, [BrojOdraslih + BrojDjece, idPONUDA]);
 
+        const sadrzaj = `Nova rezervacija za ponudu: ${ponuda[0].NazivDestinacija} (${formatDatum(ponuda[0].DatumPolaska)} - ${formatDatum(ponuda[0].DatumPovratka)})`;
+
         // 5. Obavijest agenciji
         await db.promise().query(`
             INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
             VALUES (?, NOW(), 0, ?)
         `, [
-            `Nova rezervacija za ponudu: ${ponuda[0].Opis}`,
-            ponuda[0].idKORISNIK
+            sadrzaj,
+            ponuda[0].idAgencije
         ]);
 
         res.status(201).json({
@@ -2148,9 +2198,14 @@ app.put('/moje-rezervacije/:id/otkazi', authenticateToken, async (req, res) => {
     try {
         // 1. Provjera rezervacije
         const [rezervacija] = await db.promise().query(`
-            SELECT r.*, p.idKORISNIK as idAgencije, p.Opis as nazivPonude
+            SELECT r.*, p.idKORISNIK as idAgencije, p.Opis as nazivPonude, p.DatumPolaska, p.DatumPovratka, 
+            GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS NazivDestinacija, k.Ime AS imeKorisnika,
+            k.Prezime AS prezimeKorisnika
             FROM rezervacija r
             JOIN ponuda p ON r.idPONUDA = p.idPONUDA
+            LEFT JOIN ponuda_has_destinacija phd ON p.idPONUDA = phd.idPONUDA
+            LEFT JOIN destinacija d ON phd.idDESTINACIJA = d.idDESTINACIJA
+            JOIN korisnik k ON r.idKORISNIK = k.idKORISNIK
             WHERE r.idREZERVACIJA = ? AND r.idKORISNIK = ?
         `, [idRezervacija, idKorisnik]);
 
@@ -2177,21 +2232,26 @@ app.put('/moje-rezervacije/:id/otkazi', authenticateToken, async (req, res) => {
             WHERE idPONUDA = ?
         `, [rezervacija[0].BrojOdraslih + rezervacija[0].BrojDjece, rezervacija[0].idPONUDA]);
 
+        const sadrzaj = `Korisnik ${rezervacija[0].imeKorisnika} ${rezervacija[0].prezimeKorisnika} je otkazao rezervaciju za ponudu: ${rezervacija[0].NazivDestinacija} (${formatDatum(rezervacija[0].DatumPolaska)} - ${formatDatum(rezervacija[0].DatumPovratka)}). Razlog: ${razlogOtkazivanja}`;
+
         // 5. Obavještenje agenciji (sa razlogom)
         await db.promise().query(`
             INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
             VALUES (?, NOW(), 0, ?)
         `, [
-            `Rezervacija #${idRezervacija} otkazana. Razlog: ${razlogOtkazivanja}`,
+            sadrzaj,
             rezervacija[0].idAgencije
         ]);
+
+        const sadrzaj_klijent = `Otkazali ste rezervaciju za ponudu: ${rezervacija[0].NazivDestinacija} (${formatDatum(rezervacija[0].DatumPolaska)} - ${formatDatum(rezervacija[0].DatumPovratka)})`;
+
 
         // 6. Obavještenje klijentu
         await db.promise().query(`
             INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
             VALUES (?, NOW(), 0, ?)
         `, [
-            `Otkazali ste rezervaciju #${idRezervacija}`,
+            sadrzaj_klijent,
             idKorisnik
         ]);
 
@@ -2230,11 +2290,11 @@ app.get('/obavjestenja', authenticateToken, async (req, res) => {
 
 // Sve rezervacije za jednu ponudu
 app.get('/ponude/:id/rezervacije', authenticateToken, authenticateAgency, async (req, res) => {
-  const { id } = req.params;
-  const idAgencije = req.user.idKORISNIK;
+    const { id } = req.params;
+    const idAgencije = req.user.idKORISNIK;
 
-  try {
-    const [rezervacije] = await db.promise().query(`
+    try {
+        const [rezervacije] = await db.promise().query(`
       SELECT 
         r.idREZERVACIJA,
         r.Datum,
@@ -2251,11 +2311,11 @@ app.get('/ponude/:id/rezervacije', authenticateToken, authenticateAgency, async 
       WHERE r.idPONUDA = ? AND p.idKORISNIK = ?
     `, [id, idAgencije]);
 
-    res.json(rezervacije);
-  } catch (err) {
-    console.error("Greška pri dohvatanju rezervacija za ponudu:", err);
-    res.status(500).json({ error: "Greška na serveru." });
-  }
+        res.json(rezervacije);
+    } catch (err) {
+        console.error("Greška pri dohvatanju rezervacija za ponudu:", err);
+        res.status(500).json({ error: "Greška na serveru." });
+    }
 });
 
 
