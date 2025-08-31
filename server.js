@@ -948,7 +948,9 @@ app.get('/ponude', async (req, res) => {
             JOIN 
                 korisnik k ON p.idKORISNIK = k.idKORISNIK
             WHERE 
-                p.StatusPonude = 1
+                p.StatusPonude = 1 
+            AND 
+                p.BrojSlobodnihMjesta > 0
             AND
                 k.StatusNaloga != -1
             ORDER BY 

@@ -7,7 +7,7 @@ const CompareModal = ({ isOpen, onClose, children }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button
+        {/*<button
           style={{
             float: "right",
             border: "none",
@@ -19,7 +19,7 @@ const CompareModal = ({ isOpen, onClose, children }) => {
           onClick={onClose}
         >
           &times;
-        </button>
+        </button>*/}
         {children}
       </div>
     </div>
