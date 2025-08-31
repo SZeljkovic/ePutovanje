@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Notifications.css";
 
-const API_BASE = "http://localhost:5000"; // prilagodi port ako treba
+const API_BASE = "http://localhost:5000"; 
 
 const Notifications = () => {
   const [notifikacije, setNotifikacije] = useState([]);
