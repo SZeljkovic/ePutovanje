@@ -166,6 +166,17 @@ app.post('/register', async (req, res) => {
             Email
         ]);
 
+        if (TipKorisnika ===1) {
+            const sadrzaj = `Agencija "${NazivAgencije}" je kreirala nalog. Čeka odobrenje.`;
+
+        
+            await db.promise().query(`
+                INSERT INTO obavještenje (Sadržaj, DatumVrijeme, Pročitano, idKORISNIK)
+                VALUES (?, NOW(), 0, 1)
+            `, [sadrzaj]);
+
+        }
+
         return res.status(201).json({ message: "Korisnik uspješno registrovan." });
     } catch (err) {
         console.error("Greška pri registraciji:", err);
@@ -2126,7 +2137,7 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
         // 1. Provjera ponude
         const [ponuda] = await db.promise().query(`
             SELECT p.idPONUDA, p.DatumPolaska, p.DatumPovratka, p.BrojSlobodnihMjesta,
-                   k.idKORISNIK AS idAgencije,
+                   k.idKORISNIK AS idAgencije, p.Cijena,
                    GROUP_CONCAT(d.Naziv SEPARATOR ', ') AS NazivDestinacija
             FROM ponuda p
             JOIN korisnik k ON p.idKORISNIK = k.idKORISNIK
@@ -2175,7 +2186,8 @@ app.post('/rezervisi-ponudu', authenticateToken, async (req, res) => {
         res.status(201).json({
             message: "Rezervacija uspješno kreirana",
             idREZERVACIJA: rezervacija.insertId,
-            ukupnaCijena: (BrojOdraslih + BrojDjece) * ponuda[0].Cijena
+            ukupnaCijena: (BrojOdraslih * ponuda[0].Cijena) 
+                   + (BrojDjece * ponuda[0].Cijena * 0.9)
         });
 
     } catch (err) {

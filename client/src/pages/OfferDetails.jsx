@@ -156,9 +156,9 @@ const OfferDetails = ({ modalId }) => {
     src={getDestinationImage(offer.Destinacije[0]?.Naziv)}
     alt={offer.Destinacije[0]?.Naziv || "Destinacija"}
     onError={(e) => {
-      e.currentTarget.src = '/assets/default.jpg'; // Samo fallback
+      e.currentTarget.src = '/assets/default.jpg'; 
     }}
-    onClick={(e) => openFullscreen(e.currentTarget.src)} // Klik uvijek otvara ono što se vidi
+    onClick={(e) => openFullscreen(e.currentTarget.src)} 
     style={{ cursor: "pointer" }}
   />
 </div>
