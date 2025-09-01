@@ -911,7 +911,7 @@ const AdminHome = () => {
                 {problems.map(problem => (
                   <div key={problem.idPROBLEM} className="problem-card">
                     <h4>{problem.Naslov}</h4>
-                    <p><strong>Korisnik:</strong> {problem.KorisnickoIme} (ID: {problem.idKORISNIK})</p>
+                    <p><strong>Korisnik:</strong> {problem.KorisnickoIme}</p>
                     <p>{problem.Sadržaj}</p>
                   </div>
                 ))}
