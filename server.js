@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const mysql = require('mysql2');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -9,6 +10,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
