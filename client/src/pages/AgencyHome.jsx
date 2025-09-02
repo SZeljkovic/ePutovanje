@@ -384,6 +384,11 @@ const AgencyHome = () => {
     if (activeSection === "dashboard") fetchDashboardStats();
   }, [activeSection]);
 
+  const formatDatum = (datum) => {
+    const d = new Date(datum);
+    return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+};
+
   const renderContent = () => {
     if (loading) return <p>⏳ Učitavanje...</p>;
 
@@ -496,7 +501,7 @@ const AgencyHome = () => {
                     <li><b>Prezime:</b> {profilKorisnika.Prezime}</li>
                     <li><b>Email:</b> {profilKorisnika.Email}</li>
                     <li><b>Korisničko ime:</b> {profilKorisnika.KorisnickoIme}</li>
-                    <li><b>Datum rođenja:</b> {profilKorisnika.DatumRodjenja}</li>
+                    <li><b>Datum rođenja:</b> {formatDatum(profilKorisnika.DatumRodjenja)}</li>
                   </ul>
                   <div className="zahtjev-akcije">
                     <button className="btn-back" onClick={() => setProfilKorisnika(null)}>⬅ Nazad</button>
