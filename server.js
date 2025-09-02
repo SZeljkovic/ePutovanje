@@ -2070,7 +2070,7 @@ app.get('/moje-rezervacije', authenticateToken, async (req, res) => {
                     r.StatusRezervacije === 0 ? 'Na čekanju' :
                         r.StatusRezervacije === -1 ? 'Odbijeno' :
                             r.StatusRezervacije === -2 ? 'Otkazano' : 'Nepoznato',
-            UkupnaCijena: (r.BrojOdraslih + r.BrojDjece) * r.Cijena
+            UkupnaCijena: (r.BrojOdraslih * r.Cijena) + (r.BrojDjece * r.Cijena * 0.9)
         }));
 
         res.json({
@@ -2113,7 +2113,8 @@ app.get('/moje-rezervacije/:id', authenticateToken, async (req, res) => {
         const response = {
             ...rezervacija[0],
             Destinacije: destinacije,
-            UkupnaCijena: (rezervacija[0].BrojOdraslih + rezervacija[0].BrojDjece) * rezervacija[0].Cijena
+            UkupnaCijena: (rezervacija[0].BrojOdraslih * rezervacija[0].Cijena) 
+                + (rezervacija[0].BrojDjece * rezervacija[0].Cijena * 0.9)
         };
 
         res.json(response);
